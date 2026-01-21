@@ -3,6 +3,8 @@
 Poker planning app in node.
 
 
+[@mattische](https://github.com/mattische)
+
 ## Get up and running
 
 ### install
