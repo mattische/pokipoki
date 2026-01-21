@@ -60,7 +60,12 @@ docker run --rm -p 3000:3000 pokipoki
 
 - `PORT` - server port (default: 3000)
 - `NODE_ENV` - environment (development/production)
-- `JWT_SECRET` - secret key for JWT (change in production!)
+- `JWT_SECRET` - secret key for JWT (use your own)
+
+Generete JWT token with. 
+```bash
+openssl rand base64 32
+```
 
 ## dev mode
 

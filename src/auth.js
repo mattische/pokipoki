@@ -5,7 +5,7 @@
 
 import jwt from 'jsonwebtoken';
 
-// Secret key - i produktion ska denna vara i miljövariabel
+// Secret key - create your own in .env
 const JWT_SECRET = process.env.JWT_SECRET || 'poker-planning-secret-key-change-in-production';
 
 /**
