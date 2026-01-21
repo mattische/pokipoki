@@ -27,8 +27,10 @@ docker compose up
 APP_PORT=8080 docker compose up
 ```
 
-### docker manual
+### docker
 ```bash
+# this creates a docker image from the current directory and tag it as pokipoki
+# it shows up in docker images list as pokipoki in docker desktop
 docker build -t pokipoki .
 
 # Run and auto-remove container when stopped, exposing port 3000 on local network
