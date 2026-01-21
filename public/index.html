@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pokipoki</title>
+  <meta name="description" content="poker planning tool">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Välkommen-skärm -->
+  <div id="welcome-screen" class="screen active">
+    <div class="welcome-container">
+      <div class="logo-container">
+        <h1 class="logo">pokipoki</h1>
+        <p class="tagline">Poker Planning Tool</p>
+      </div>
+
+      <div class="welcome-card">
+        <h2 data-i18n="welcome.heading">Start</h2>
+
+        <div class="form-group">
+          <label for="username" data-i18n="welcome.name.label">Ditt namn</label>
+          <input type="text" id="username" data-i18n-placeholder="welcome.name.placeholder" placeholder="Ange ditt namn"
+            autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="theme-selector" data-i18n="welcome.theme.label">Theme</label>
+          <select id="theme-selector">
+            <option value="modern" data-i18n="theme.modern">Modern (Glassmorphism)</option>
+            <option value="flat" data-i18n="theme.flat">Flat Design</option>
+            <option value="retro" data-i18n="theme.retro">Retro 90s</option>
+          </select>
+        </div>
+
+        <div class="button-group">
+          <button id="create-session-btn" class="btn btn-primary">
+            <span class="btn-icon">✨</span>
+            <span data-i18n="welcome.create.button">Skapa ny session</span>
+          </button>
+
+          <div class="divider" data-i18n="welcome.divider">eller</div>
+
+          <div class="form-group">
+            <label for="session-id-input" data-i18n="welcome.sessionid.label">Session-ID</label>
+            <input type="text" id="session-id-input" class="session-id-input"
+              data-i18n-placeholder="welcome.sessionid.placeholder" placeholder="Ange session-ID (t.ex. A1B2C3D4)"
+              maxlength="8">
+          </div>
+
+          <button id="join-session-btn" class="btn btn-secondary">
+            <span class="btn-icon"></span>
+            <span data-i18n="welcome.join.button">Gå med i session</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Huvud-skärm för poker planning -->
+  <div id="planning-screen" class="screen">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">pokipoki</h1>
+        <div class="session-info">
+          <div class="session-id-container">
+            <span class="label" data-i18n="session.id.label">ID:</span>
+            <span id="session-id-display" class="session-id"></span>
+            <br><button id="copy-session-id-btn" class="btn-icon-only copy-btn" title="Copy Session ID">
+              copy
+            </button>
+          </div>
+          <button id="end-session-btn" class="btn btn-danger hidden" data-i18n="session.end.button">End Session</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="language-toggle" class="btn-icon-only" title="Switch language">🌐</button>
+        <span id="username-display" class="username-badge"></span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Deltagare panel -->
+      <aside class="participants-panel">
+        <h3><span data-i18n="participants.heading">Deltagare</span> <span id="participant-count"
+            class="count-badge">0</span></h3>
+        <div id="participants-list" class="participants-list"></div>
+
+        <!-- Chat component -->
+        <div class="chat-component">
+          <h4 data-i18n="chat.heading">Chat</h4>
+          <div id="chat-messages" class="chat-messages"></div>
+          <div class="chat-input-group">
+            <input type="text" id="chat-input" data-i18n-placeholder="chat.placeholder" placeholder="Type a message..."
+              maxlength="200">
+            <button id="chat-send-btn" class="btn-icon-only" title="Send">
+              ➤
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Voting area -->
+      <section class="voting-section">
+        <!-- Waiting message for non-hosts -->
+        <div id="waiting-message" class="waiting-message hidden">
+          <div class="waiting-icon">⏳</div>
+          <h3 data-i18n="voting.waiting.title">Waiting for voting to begin</h3>
+          <p data-i18n="voting.waiting.description">The session host will start the round when ready.</p>
+        </div>
+
+        <div id="timer-controls" class="timer-controls">
+          <div class="timer-input-group">
+            <label for="timer-duration" data-i18n="voting.timer.label">Timer (minuter):</label>
+            <input type="number" id="timer-duration" min="0" max="60" value="2" step="0.5">
+          </div>
+          <button id="start-voting-btn" class="btn btn-primary">
+            <span class="btn-icon">▶</span>
+            <span data-i18n="voting.start.button">Starta röstning</span>
+          </button>
+        </div>
+
+        <!-- Timer display -->
+        <div id="timer-display" class="timer-display hidden">
+          <div class="timer-circle">
+            <svg class="timer-svg" viewBox="0 0 100 100">
+              <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
+              <circle id="timer-progress" class="timer-progress" cx="50" cy="50" r="45"></circle>
+            </svg>
+            <div class="timer-text">
+              <span id="timer-value">0:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Voting cards -->
+        <div id="voting-area" class="voting-area hidden">
+          <h2 id="round-title" data-i18n="voting.choose.heading">Välj ditt kort</h2>
+          <div class="cards-container" id="cards-container">
+            <button class="card" data-value="0">0</button>
+            <button class="card" data-value="1">1</button>
+            <button class="card" data-value="2">2</button>
+            <button class="card" data-value="3">3</button>
+            <button class="card" data-value="5">5</button>
+            <button class="card" data-value="8">8</button>
+            <button class="card" data-value="13">13</button>
+            <button class="card" data-value="21">21</button>
+            <button class="card" data-value="34">34</button>
+            <button class="card" data-value="55">55</button>
+            <button class="card" data-value="89">89</button>
+            <button class="card" data-value="?">?</button>
+            <button class="card" data-value="∞">∞</button>
+          </div>
+          <p class="vote-status" id="vote-status"></p>
+
+          <div class="reveal-controls hidden" id="reveal-controls">
+            <button id="reveal-now-btn" class="btn btn-primary">
+              <span class="btn-icon"></span>
+              <span data-i18n="voting.reveal.button">Avslöja nu</span>
+            </button>
+            <p class="reveal-hint" id="reveal-hint" data-i18n="voting.reveal.hint.waiting">Väntar på att alla ska
+              rösta...</p>
+          </div>
+        </div>
+
+        <!-- Results area -->
+        <div id="results-area" class="results-area hidden">
+          <h2 data-i18n="results.heading">Resultat</h2>
+          <div id="results-grid" class="results-grid"></div>
+
+
+          <div id="admin-controls" class="admin-controls hidden">
+            <button id="new-round-btn" class="btn btn-primary">
+              <span class="btn-icon"></span>
+              <span data-i18n="results.newround.button">Ny runda</span>
+            </button>
+          </div>
+        </div>
+  </div>
+  </section>
+  </main>
+  </div>
+
+  <!-- Socket.IO klient -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Vår modulära klient-logik -->
+  <script type="module" src="js/client.js"></script>
+</body>
+
+</html>
