@@ -12,9 +12,10 @@ npm install
 
 ### run app
 ```bash
-npm start
 # http://localhost:<port setting in .env>
-# invite users by sending session id to them
+# first user is host - invite users by sending session id to them
+
+npm start
 ```
 
 ### docker compose
