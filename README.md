@@ -1,26 +1,28 @@
-# Poker Planning Web App
+# pokipoki
 
-A modern poker planning application built with Node.js, WebSockets, JWT, timer functionality, and real-time updates.
+Poker planning app in node.
+Provided docker compose uses settings in .env file (port).
 
-## Quick Start
+## Get up and running
 
-### Installation
+### install
 ```bash
 npm install
 ```
 
-### Run Application
+### run app
 ```bash
 npm start
-# Open http://localhost:3000
+# http://localhost:<port setting in .env>
+# invite users by sending session id to them
 ```
 
 ### docker compose
 ```bash
-# Run with default port 3000
+# default port as specified in .env
 docker compose up
 
-# Run on a different port (e.g., 8080)
+# if you want to change port (e.g., 8080)
 APP_PORT=8080 docker compose up
 ```
 
@@ -28,67 +30,44 @@ APP_PORT=8080 docker compose up
 ```bash
 docker build -t pokipoki .
 
-# Run and auto-remove container when stopped
+# Run and auto-remove container when stopped, exposing port 3000 on local network
 docker run --rm -p 3000:3000 pokipoki
 ```
 
-## Features
-- Run poker planning sessions with team
-- 3 different themes
-- Swedish and English language support
-- Timer functionality
-- Real-time updates
-- JWT authentication
-- Chat functionality
+## features
+- run poker planning sessions with team, in browser
+- 3 themes
+- timer
+- chat
 
-## Architecture
+## arch
 
-### Backend
-- `server.js` - Express server with Socket.IO
-- `src/auth.js` - JWT authentication
-- `src/sessionManager.js` - Session management
-- `src/socketHandler.js` - WebSocket event handling
+### backend
+- `server.js` - express server with socket.io
+- `src/auth.js` - JWT auth
+- `src/sessionManager.js` - sessions
+- `src/socketHandler.js` - event handling for socket
 
-### Frontend
-- `public/index.html` - HTML structure
-- `public/styles.css` - Design system
-- `public/js/client.js` - Main client module
-- `public/js/socket.js` - WebSocket communication
-- `public/js/ui.js` - UI management
-- `public/js/themeManager.js` - Theme management
+### frontend
+- `public/index.html` - html
+- `public/*.css` - style sheet with themes
+- `public/js/client.js` - client js
+- `public/js/socket.js` - socket logic
+- `public/js/ui.js` - ui scripts
+- `public/js/themeManager.js` - theme management
 
-## Tech Stack
+## env variables
 
-- **Backend**: node.js, express, socket.io
-- **Frontend**: javascript (es modules), html5, css3
-- **Auth**: JWT (jsonwebtoken)
-- **Containerization**: Docker, Docker Compose
+- `PORT` - server port (default: 3000)
+- `NODE_ENV` - environment (development/production)
+- `JWT_SECRET` - secret key for JWT (change in production!)
 
-## Usage
-
-1. **Create Session**: Enter your name and click "Create New Session"
-2. **Share ID**: Others can join using the session ID
-3. **Start Voting**: Set timer and start the round
-4. **Choose Card**: All participants choose their card
-5. **Results**: Cards are revealed automatically when timer ends or manually by host
-6. **New Round**: Host clicks "new voting" to start the next story
-
-## Environment Variables
-
-- `PORT` - Server port (default: 3000)
-- `NODE_ENV` - Environment (development/production)
-- `JWT_SECRET` - Secret key for JWT (change in production!)
-
-## Development
+## dev mode
 
 ```bash
-# Development mode with watch
+# dev mode with watch
 npm run dev
 
-# Development with Docker
+# dev with Docker
 docker-compose --profile dev up
 ```
-
-## License
-
-MIT
