@@ -1,7 +1,7 @@
 {
   "name": "poker-planning",
   "version": "1.0.0",
-  "description": "En modern realtids poker planning-applikation med timer och diskussionsfunktioner",
+  "description": "poker planning-app",
   "type": "module",
   "main": "server.js",
   "scripts": {
