@@ -5,11 +5,11 @@ services:
     build: .
     container_name: pokipoki
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - "${PORT:-1337}:1337"  # Host:Container
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - PORT=${PORT:-3000}
-      - JWT_SECRET=${JWT_SECRET:-production-secret-key}
+      - PORT=1337  # Fast intern port
+      - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped
 
   # Development service med volume mapping
