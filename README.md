@@ -1,7 +1,7 @@
 # pokipoki
 
 Poker planning app in node.
-Provided docker compose uses settings in .env file (port).
+
 
 ## Get up and running
 
@@ -17,6 +17,10 @@ npm install
 
 npm start
 ```
+
+## docker
+
+_provided docker compose uses settings in .env file (port)._
 
 ### docker compose
 ```bash
