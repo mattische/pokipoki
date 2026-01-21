@@ -40,6 +40,7 @@ docker run --rm -p 3000:3000 pokipoki
 - timer
 - chat
 - first participant will be host and a session id is created; share id with others to invite them
+  
 
 ## arch
 
