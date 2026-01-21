@@ -1,17 +1,17 @@
 /**
- * Sessionshanteringsmodul
- * Hanterar poker planning-sessioner, deltagare, och timer-funktionalitet
+ * session management module
+ * handles sessions, participants, and timer
  */
 
 import { randomBytes } from 'crypto';
 
-// In-memory datalagring för sessioner
+// in-memory session storage
 const sessions = new Map();
 
 /**
- * Skapar en ny poker planning session
- * @param {string} creatorName - Namnet på personen som skapar sessionen
- * @returns {Object} Session-objekt med sessionId och token
+ * creates new poker planning session
+ * @param {string} creatorName - creator name
+ * @returns {Object} session object with sessionId and token
  */
 export function createSession(creatorName, theme = 'modern') {
     const sessionId = generateSessionId();
@@ -19,7 +19,7 @@ export function createSession(creatorName, theme = 'modern') {
     const session = {
         id: sessionId,
         createdAt: new Date(),
-        creatorId: null, // Sätts när skaparen går med
+        creatorId: null, // set when creator joins
         theme: theme, // Store selected theme
         participants: new Map(),
         currentRound: {
@@ -42,11 +42,11 @@ export function createSession(creatorName, theme = 'modern') {
 }
 
 /**
- * Lägger till en deltagare i en session
- * @param {string} sessionId - Session ID
- * @param {string} userId - Användar ID
- * @param {string} username - Användarnamn
- * @returns {boolean} true om lyckad, annars false
+ * adds participant to session
+ * @param {string} sessionId - session id
+ * @param {string} userId - user id
+ * @param {string} username - username
+ * @returns {boolean} true if successful
  */
 export function joinSession(sessionId, userId, username) {
     const session = sessions.get(sessionId);
@@ -54,7 +54,8 @@ export function joinSession(sessionId, userId, username) {
         return false;
     }
 
-    // Sätt creatorId om detta är första deltagaren
+    // set creatorId if first participant
+    // first participant will be "host" session id is created
     if (session.participants.size === 0) {
         session.creatorId = userId;
     }
@@ -71,9 +72,9 @@ export function joinSession(sessionId, userId, username) {
 }
 
 /**
- * Tar bort en deltagare från en session
- * @param {string} sessionId - Session ID
- * @param {string} userId - Användar ID
+ * removes participant from session
+ * @param {string} sessionId - session id
+ * @param {string} userId - user id
  */
 export function leaveSession(sessionId, userId) {
     const session = sessions.get(sessionId);
@@ -84,7 +85,7 @@ export function leaveSession(sessionId, userId) {
         session.participants.delete(userId);
         console.log(`User ${participant.username} left session ${sessionId}`);
 
-        // Ta bort sessionen om den är tom
+        // remove session if empty
         if (session.participants.size === 0) {
             sessions.delete(sessionId);
             console.log(`Session ${sessionId} removed (empty)`);
@@ -93,20 +94,20 @@ export function leaveSession(sessionId, userId) {
 }
 
 /**
- * Hämtar en session
- * @param {string} sessionId - Session ID
- * @returns {Object|null} Session-objekt eller null
+ * gets session
+ * @param {string} sessionId - session id
+ * @returns {Object|null} session object or null
  */
 export function getSession(sessionId) {
     return sessions.get(sessionId) || null;
 }
 
 /**
- * Sätter en deltagares röst
- * @param {string} sessionId - Session ID
- * @param {string} userId - Användar ID
- * @param {string} vote - Röstvärde (kort)
- * @returns {boolean} true om lyckad
+ * sets participant vote
+ * @param {string} sessionId - session id
+ * @param {string} userId - user id
+ * @param {string} vote - vote value (card)
+ * @returns {boolean} true if successful
  */
 export function setVote(sessionId, userId, vote) {
     const session = sessions.get(sessionId);
@@ -119,10 +120,10 @@ export function setVote(sessionId, userId, vote) {
 }
 
 /**
- * Startar en ny röstningsomgång med timer
- * @param {string} sessionId - Session ID
- * @param {number} timerDuration - Timer i sekunder (0 = ingen timer)
- * @returns {boolean} true om lyckad
+ * starts new voting round with timer
+ * @param {string} sessionId - session id
+ * @param {number} timerDuration - timer in seconds (0 = no timer)
+ * @returns {boolean} true if successful
  */
 export function startVoting(sessionId, timerDuration = 0) {
     const session = sessions.get(sessionId);
@@ -150,9 +151,9 @@ export function startVoting(sessionId, timerDuration = 0) {
 }
 
 /**
- * Avslöjar alla röster (manuellt eller när timer går ut)
- * @param {string} sessionId - Session ID
- * @returns {Object|null} Röstresultat
+ * reveals all votes (manual or timer)
+ * @param {string} sessionId - session id
+ * @returns {Object|null} vote results
  */
 export function revealVotes(sessionId) {
     const session = sessions.get(sessionId);
@@ -175,14 +176,14 @@ export function revealVotes(sessionId) {
 }
 
 /**
- * Återställer röstningsomgången för ny omröstning
- * @param {string} sessionId - Session ID
+ * resets voting round for new vote
+ * @param {string} sessionId - session id
  */
 export function resetRound(sessionId) {
     const session = sessions.get(sessionId);
     if (!session) return;
 
-    // Save current round to history if it was revealed
+    // save round to history if revealed
     if (session.currentRound.revealed && session.currentRound.votes.size > 0) {
         const roundSummary = {
             roundNumber: session.currentRound.roundNumber,
@@ -198,7 +199,7 @@ export function resetRound(sessionId) {
 
     session.currentRound = {
         active: false,
-        roundNumber: session.currentRound.roundNumber, // Behåll runda-numret till nästa start
+        roundNumber: session.currentRound.roundNumber, // keep round number for next start
         votes: new Map(),
         revealed: false,
         timer: null,
@@ -210,17 +211,17 @@ export function resetRound(sessionId) {
 }
 
 /**
- * Genererar ett unikt session ID
- * @returns {string} Session ID
+ * generates unique session id
+ * @returns {string} session id
  */
 function generateSessionId() {
     return randomBytes(4).toString('hex').toUpperCase();
 }
 
 /**
- * Hämtar alla deltagare i en session
- * @param {string} sessionId - Session ID
- * @returns {Array} Lista av deltagare
+ * gets all session participants
+ * @param {string} sessionId - session id
+ * @returns {Array} participant list
  */
 export function getParticipants(sessionId) {
     const session = sessions.get(sessionId);
@@ -230,8 +231,8 @@ export function getParticipants(sessionId) {
 }
 
 /**
- * Kontrollerar om en session existerar
- * @param {string} sessionId - Session ID
+ * checks if session exists
+ * @param {string} sessionId - session id
  * @returns {boolean}
  */
 export function sessionExists(sessionId) {
@@ -239,11 +240,11 @@ export function sessionExists(sessionId) {
 }
 
 /**
- * Lägger till ett chattmeddelande i sessionen
- * @param {string} sessionId - Session ID
- * @param {string} userId - Användar ID
- * @param {string} message - Meddelande
- * @returns {Object|null} Meddelandeobjekt eller null
+ * adds chat message to session
+ * @param {string} sessionId - session id
+ * @param {string} userId - user id
+ * @param {string} message - message text
+ * @returns {Object|null} message object or null
  */
 export function addChatMessage(sessionId, userId, message) {
     const session = sessions.get(sessionId);
@@ -265,9 +266,9 @@ export function addChatMessage(sessionId, userId, message) {
 }
 
 /**
- * Hämtar alla chattmeddelanden för en session
- * @param {string} sessionId - Session ID
- * @returns {Array} Lista av chattmeddelanden
+ * gets all chat messages for session
+ * @param {string} sessionId - session id
+ * @returns {Array} chat message list
  */
 export function getChatMessages(sessionId) {
     const session = sessions.get(sessionId);
@@ -276,9 +277,9 @@ export function getChatMessages(sessionId) {
 }
 
 /**
- * Hämtar rundhistorik för en session
- * @param {string} sessionId - Session ID
- * @returns {Array} Lista av avslutade rundor
+ * gets round history for session
+ * @param {string} sessionId - session id
+ * @returns {Array} completed round list
  */
 export function getRoundHistory(sessionId) {
     const session = sessions.get(sessionId);
@@ -286,9 +287,9 @@ export function getRoundHistory(sessionId) {
     return session.roundHistory;
 }
 /**
- * Uppdaterar tema för en session
- * @param {string} sessionId - Session ID
- * @param {string} theme - Tema namn (modern, flat, retro)
+ * updates session theme
+ * @param {string} sessionId - session id
+ * @param {string} theme - theme name (modern, flat, retro)
  */
 export function setTheme(sessionId, theme) {
     const session = sessions.get(sessionId);
@@ -301,13 +302,13 @@ export function setTheme(sessionId, theme) {
 }
 
 /**
- * Tar bort en session
- * @param {string} sessionId - Session ID
+ * deletes session
+ * @param {string} sessionId - session id
  */
 export function deleteSession(sessionId) {
     const session = sessions.get(sessionId);
     if (session) {
-        // Stoppa eventuell timer
+        // stop timer if active
         if (session.currentRound.timer) {
             clearTimeout(session.currentRound.timer);
         }

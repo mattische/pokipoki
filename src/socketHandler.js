@@ -1,6 +1,6 @@
 /**
- * WebSocket Event Handler
- * Hanterar Socket.IO events för realtidskommunikation
+ * websocket event handler
+ * handles socket.io events for realtime communication
  */
 
 import {
@@ -24,8 +24,8 @@ import {
 import { verifyToken, extractTokenFromSocket } from './auth.js';
 
 /**
- * Sätter upp Socket.IO event handlers
- * @param {Object} io - Socket.IO server-instans
+ * sets up socket.io event handlers
+ * @param {Object} io - socket.io server instance
  */
 export function setupSocketHandlers(io) {
     io.on('connection', (socket) => {
@@ -34,7 +34,7 @@ export function setupSocketHandlers(io) {
         let currentUserId = null;
         let currentSessionId = null;
 
-        // Autentisering vid anslutning (om token finns)
+        // authenticate on connect (if token exists)
         const token = extractTokenFromSocket(socket);
         if (token) {
             const payload = verifyToken(token);
@@ -46,14 +46,14 @@ export function setupSocketHandlers(io) {
         }
 
         /**
-         * Hanterar session-skapande och anslutning
+         * handles session creation and joining
          */
         socket.on('join-session', (data, callback) => {
             const { username, sessionId, create } = data;
             const userId = socket.id;
 
             if (create || !sessionId) {
-                // Skapa ny session
+                // create new session
                 const theme = data.theme || 'modern';
                 const { sessionId: newSessionId } = createSession(username, theme);
                 const session = getSession(newSessionId);
@@ -79,7 +79,7 @@ export function setupSocketHandlers(io) {
                 // Broadcast till alla i sessionen
                 emitParticipantsUpdate(io, newSessionId);
             } else {
-                // Gå med i befintlig session
+                // join existing session
                 if (!sessionExists(sessionId)) {
                     callback({ success: false, error: 'Session finns inte' });
                     return;
@@ -108,7 +108,7 @@ export function setupSocketHandlers(io) {
                 // Broadcast till alla i sessionen
                 emitParticipantsUpdate(io, sessionId);
 
-                // Skicka nuvarande session-status till ny deltagare
+                // send current session status to new joiner
                 if (session && session.currentRound.active) {
                     socket.emit('voting-started', {
                         timerDuration: session.currentRound.timerDuration,
@@ -118,14 +118,14 @@ export function setupSocketHandlers(io) {
                     });
                 }
 
-                // Skicka chatthistorik till ny deltagare
+                // send chat history to new joiner
                 const chatMessages = getChatMessages(sessionId);
                 socket.emit('chat-history', chatMessages);
             }
         });
 
         /**
-         * Startar en ny röstningsomgång
+         * starts new voting round
          */
         socket.on('start-voting', (data) => {
             if (!currentSessionId) return;
@@ -141,7 +141,7 @@ export function setupSocketHandlers(io) {
                 roundNumber: session.currentRound.roundNumber
             });
 
-            // Om timer är satt, sätt upp automatisk reveal
+            // auto reveal if timer is set
             if (timerDuration > 0) {
                 setTimeout(() => {
                     handleRevealVotes(io, currentSessionId);
@@ -150,7 +150,7 @@ export function setupSocketHandlers(io) {
         });
 
         /**
-         * Hanterar när en användare lägger sin röst
+         * handles user vote submission
          */
         socket.on('submit-vote', (data) => {
             if (!currentSessionId || !currentUserId) return;
@@ -158,14 +158,14 @@ export function setupSocketHandlers(io) {
             const { vote } = data;
             setVote(currentSessionId, currentUserId, vote);
 
-            // Broadcast att användaren har röstat (men inte värdet)
+            // broadcast that user voted (not the value)
             io.to(currentSessionId).emit('user-voted', {
                 userId: currentUserId
             });
         });
 
         /**
-         * Avslöjar alla röster manuellt
+         * reveals all votes manually
          */
         socket.on('reveal-votes', () => {
             if (!currentSessionId) return;
@@ -175,7 +175,7 @@ export function setupSocketHandlers(io) {
 
 
         /**
-         * Återställer omröstningen
+         * resets voting round
          */
         socket.on('reset-round', () => {
             if (!currentSessionId) return;
@@ -217,7 +217,7 @@ export function setupSocketHandlers(io) {
         });
 
         /**
-         * Hanterar chattmeddelanden
+         * handles chat messages
          */
         socket.on('send-message', (data) => {
             console.log('=== SEND-MESSAGE EVENT RECEIVED ===');
@@ -242,7 +242,7 @@ export function setupSocketHandlers(io) {
             console.log('Chat message created:', chatMessage);
 
             if (chatMessage) {
-                // Broadcast meddelandet till alla i sessionen
+                // broadcast message to all in session
                 console.log('Broadcasting to session:', currentSessionId);
                 io.to(currentSessionId).emit('chat-message', chatMessage);
                 console.log('Message broadcast complete');
@@ -253,7 +253,7 @@ export function setupSocketHandlers(io) {
         });
 
         /**
-         * Hanterar manuell session-avslutning
+         * handles manual session end
          */
         socket.on('end-session', () => {
             if (!currentSessionId || !currentUserId) return;
@@ -274,7 +274,7 @@ export function setupSocketHandlers(io) {
         });
 
         /**
-         * Hanterar frånkoppling
+         * handles disconnect
          */
         socket.on('disconnect', () => {
             console.log(`Client disconnected: ${socket.id}`);
@@ -297,7 +297,7 @@ export function setupSocketHandlers(io) {
     });
 }
 /**
- * Helper: Avslöjar röster och broadcastar resultat
+ * helper: reveals votes and broadcasts results
  */
 function handleRevealVotes(io, sessionId) {
     const results = revealVotes(sessionId);

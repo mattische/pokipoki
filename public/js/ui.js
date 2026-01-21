@@ -1,6 +1,6 @@
 /**
- * UI-hanteringsmodul
- * Hanterar DOM-manipulation och visuella uppdateringar
+ * ui management module
+ * handles dom manipulation and visual updates
  */
 
 import { i18n } from './i18n.js';
@@ -15,7 +15,7 @@ export class UIManager {
     }
 
     /**
-     * Byter mellan skärmar
+     * switches between screens
      */
     showScreen(screenName) {
         document.querySelectorAll('.screen').forEach(screen => {
@@ -30,7 +30,7 @@ export class UIManager {
     }
 
     /**
-     * Visar session-information
+     * displays session information
      */
     displaySessionInfo(sessionId, username, isCreator = false) {
         document.getElementById('session-id-display').textContent = sessionId;
@@ -58,7 +58,7 @@ export class UIManager {
     }
 
     /**
-     * Uppdaterar deltagarlistan
+     * updates participant list
      */
     updateParticipants(participants, isCreator = false, currentUserId = null) {
         const listElement = document.getElementById('participants-list');
@@ -81,7 +81,7 @@ export class UIManager {
     }
 
     /**
-     * Markerar att en användare har röstat
+     * marks that user has voted
      */
     markUserVoted(userId) {
         const participantItem = document.querySelector(`[data-user-id="${userId}"]`);
@@ -91,7 +91,7 @@ export class UIManager {
     }
 
     /**
-     * Visar röstningsområdet och gömmer kontroller
+     * shows voting area and hides controls
      */
     showVotingArea(timerDuration, timerStartedAt, isCreator = false, roundInfo = null) {
         // Hide waiting message and controls
@@ -101,19 +101,19 @@ export class UIManager {
         // Show voting area
         document.getElementById('voting-area').classList.remove('hidden');
 
-        // Visa reveal controls för sessionsskapare
+        // show reveal controls for creator
         if (isCreator) {
             document.getElementById('reveal-controls').classList.remove('hidden');
         }
 
-        // Starta timer om det finns en
+        // start timer if exists
         if (timerDuration > 0 && timerStartedAt) {
             this.startTimer(timerDuration, new Date(timerStartedAt));
         }
     }
 
     /**
-     * Startar och visar timer
+     * starts and displays timer
      */
     startTimer(durationSeconds, startedAt) {
         const timerDisplay = document.getElementById('timer-display');
@@ -122,10 +122,10 @@ export class UIManager {
 
         timerDisplay.classList.remove('hidden');
 
-        // Beräkna när timern slutar
+        // calculate when timer ends
         this.timerEndTime = new Date(startedAt.getTime() + durationSeconds * 1000);
 
-        const circumference = 2 * Math.PI * 45; // Radie = 45
+        const circumference = 2 * Math.PI * 45; // radius = 45
 
         const updateTimer = () => {
             const now = new Date();
@@ -144,18 +144,18 @@ export class UIManager {
 
             timerValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-            // Uppdatera progress circle
+            // update progress circle
             const progress = remainingSeconds / durationSeconds;
             const offset = circumference * (1 - progress);
             timerProgress.style.strokeDashoffset = offset;
         };
 
-        updateTimer(); // Initial uppdatering
+        updateTimer(); // initial update
         this.timerInterval = setInterval(updateTimer, 1000);
     }
 
     /**
-     * Stoppar timern
+     * stops timer
      */
     stopTimer() {
         if (this.timerInterval) {
@@ -166,24 +166,24 @@ export class UIManager {
     }
 
     /**
-     * Hanterar kortval
+     * handles card selection
      */
     handleCardSelection(card) {
-        // Ta bort tidigare val
+        // remove previous selection
         document.querySelectorAll('.card').forEach(c => {
             c.classList.remove('selected');
         });
 
-        // Markera valt kort
+        // mark selected card
         card.classList.add('selected');
         this.selectedVote = card.dataset.value;
 
-        // Uppdatera status
+        // update status
         document.getElementById('vote-status').textContent = `${i18n.t('voting.status.selected')} ${this.selectedVote}`;
     }
 
     /**
-     * Uppdaterar reveal-kontroller baserat på röststatistik
+     * updates reveal controls based on vote stats
      */
     updateRevealControls(allVoted, totalVotes, totalParticipants) {
         const hint = document.getElementById('reveal-hint');
@@ -200,16 +200,16 @@ export class UIManager {
     }
 
     /**
-     * Visar resultat
+     * shows results
      */
     showResults(results) {
         // Stoppa timer
         this.stopTimer();
 
-        // Göm röstningsområde
+        // hide voting area
         document.getElementById('voting-area').classList.add('hidden');
 
-        // Visa resultatområde
+        // show results area
         const resultsArea = document.getElementById('results-area');
         const resultsGrid = document.getElementById('results-grid');
 
@@ -267,7 +267,7 @@ export class UIManager {
 
         resultsGrid.innerHTML = html;
 
-        // Visa admin-kontroller om användaren är skapare
+        // show admin controls if user is creator
         if (this.isCreator) {
             const adminControls = document.getElementById('admin-controls');
             if (adminControls) {
@@ -278,7 +278,7 @@ export class UIManager {
 
 
     /**
-     * Lägger till en förklaring i listan
+     * adds explanation to list
      */
     addExplanation(userId, username, explanation) {
         const list = document.getElementById('explanations-list');
@@ -294,13 +294,13 @@ export class UIManager {
     }
 
     /**
-     * Återställer UI för ny omröstning
+     * resets ui for new voting
      */
     resetForNewRound() {
-        // Stoppa timer
+        // stop timer
         this.stopTimer();
 
-        // Rensa val
+        // clear selection
         this.selectedVote = null;
         document.querySelectorAll('.card').forEach(c => {
             c.classList.remove('selected');
@@ -309,10 +309,10 @@ export class UIManager {
     }
 
     /**
-     * Återställer vyn för ny runda
+     * resets view for new round
      */
     resetView() {
-        // Göm resultat och admin-kontroller
+        // hide results and admin controls
         document.getElementById('results-area').classList.add('hidden');
         const adminControls = document.getElementById('admin-controls');
         if (adminControls) {
@@ -327,17 +327,17 @@ export class UIManager {
         // Ensure voting area is hidden
         document.getElementById('voting-area').classList.add('hidden');
 
-        // Rensa valda kort
+        // clear selected cards
         document.querySelectorAll('.card').forEach(card => {
             card.classList.remove('selected');
         });
 
-        // Rensa voted-markeringar från deltagare
+        // clear voted marks from participants
         document.querySelectorAll('.participant-item').forEach(p => {
             p.classList.remove('voted');
         });
 
-        // Återställ röststatus i deltagarlistan (om status-icon används)
+        // reset vote status in participant list (if status-icon used)
         document.querySelectorAll('.status-icon').forEach(icon => {
             icon.textContent = '';
             icon.className = 'status-icon';
@@ -354,21 +354,21 @@ export class UIManager {
     }
 
     /**
-     * Visar felmeddelande
+     * shows error message
      */
     showError(message) {
-        alert(message); // Enkel implementation - kan förbättras med toast/modal
+        alert(message); // simple implementation - can improve with toast/modal
     }
 
     /**
-     * Visar success-meddelande
+     * shows success message
      */
     showSuccess(message) {
         console.log('Success:', message);
     }
 
     /**
-     * Lägger till ett chattmeddelande
+     * adds chat message
      */
     addChatMessage(chatMessage) {
         console.log('Adding chat message to UI:', chatMessage);

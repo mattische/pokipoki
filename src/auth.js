@@ -1,6 +1,6 @@
 /**
- * JWT Autentiseringsmodul
- * Hanterar generering och validering av JWT tokens för användare
+ * jwt authentication module
+ * handles token generation and validation
  */
 
 import jwt from 'jsonwebtoken';
@@ -9,20 +9,20 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'poker-planning-secret-key-change-in-production';
 
 /**
- * Genererar en JWT token för en användare
- * @param {Object} payload - Data att inkludera i token (userId, sessionId, username)
+ * generates jwt token
+ * @param {Object} payload - data to include (userId, sessionId, username)
  * @returns {string} JWT token
  */
 export function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: '24h' // Token giltig i 24 timmar
+    expiresIn: '24h' // token valid for 24 hours
   });
 }
 
 /**
- * Validerar och dekoderar en JWT token
- * @param {string} token - JWT token att validera
- * @returns {Object|null} Dekodad payload eller null om ogiltig
+ * validates and decodes jwt token
+ * @param {string} token - jwt token to validate
+ * @returns {Object|null} decoded payload or null if invalid
  */
 export function verifyToken(token) {
   try {
@@ -34,12 +34,12 @@ export function verifyToken(token) {
 }
 
 /**
- * Extraherar token från Socket.IO handshake
- * @param {Object} socket - Socket.IO socket objekt
- * @returns {string|null} Token eller null
+ * extracts token from socket.io handshake
+ * @param {Object} socket - socket.io socket object
+ * @returns {string|null} token or null
  */
 export function extractTokenFromSocket(socket) {
-  // Token kan komma från auth object eller query parameter
+  // token from auth object or query parameter
   const token = socket.handshake.auth?.token || socket.handshake.query?.token;
   return token || null;
 }

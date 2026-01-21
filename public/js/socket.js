@@ -1,6 +1,6 @@
 /**
- * WebSocket kommunikationsmodul
- * Hanterar Socket.IO klient-anslutning och events
+ * websocket communication module
+ * handles socket.io client connection and events
  */
 
 export class SocketManager {
@@ -9,12 +9,12 @@ export class SocketManager {
         this.sessionId = null;
         this.userId = null;
         this.username = null;
-        this.isCreator = false; // Om användaren är sessionsskapare
+        this.isCreator = false; // if user is session creator
         this.eventHandlers = new Map();
     }
 
     /**
-     * Initierar Socket.IO-anslutning
+     * initializes socket.io connection
      */
     connect() {
         this.socket = io();
@@ -31,7 +31,7 @@ export class SocketManager {
     }
 
     /**
-     * Skapar en ny session
+     * creates new session
      */
     createSession(username, theme = 'modern') {
         return new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ export class SocketManager {
     }
 
     /**
-     * Går med i en befintlig session
+     * joins existing session
      */
     async joinSession(sessionId, username) {
         return new Promise((resolve, reject) => {
@@ -77,22 +77,22 @@ export class SocketManager {
     }
 
     /**
-     * Startar en röstningsomgång
+     * starts voting round
      */
     startVoting(timerMinutes) {
-        const timerDuration = timerMinutes * 60; // Konvertera till sekunder
+        const timerDuration = timerMinutes * 60; // convert to seconds
         this.socket.emit('start-voting', { timerDuration });
     }
 
     /**
-     * Skickar in sin röst
+     * submits vote
      */
     submitVote(vote) {
         this.socket.emit('submit-vote', { vote });
     }
 
     /**
-     * Avslöjar röster manuellt
+     * reveals votes manually
      */
     revealVotes() {
         this.socket.emit('reveal-votes');
@@ -101,28 +101,28 @@ export class SocketManager {
 
 
     /**
-     * Återställer omröstningen
+     * resets voting
      */
     resetRound() {
         this.socket.emit('reset-round');
     }
 
     /**
-     * Kickar en användare från sessionen (endast för sessionsskapare)
+     * kicks user from session (creator only)
      */
     kickUser(userId) {
         this.socket.emit('kick-user', { userId });
     }
 
     /**
-     * Skickar ett chattmeddelande
+     * sends chat message
      */
     sendMessage(message) {
         this.socket.emit('send-message', { message });
     }
 
     /**
-     * Registrerar event-hanterare
+     * registers event handler
      */
     on(event, handler) {
         this.eventHandlers.set(event, handler);
@@ -130,7 +130,7 @@ export class SocketManager {
     }
 
     /**
-     * Avregistrerar event-hanterare
+     * unregisters event handler
      */
     off(event) {
         const handler = this.eventHandlers.get(event);

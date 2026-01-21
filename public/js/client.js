@@ -1,6 +1,6 @@
 /**
- * Huvudmodul för poker planning-klienten
- * Koordinerar WebSocket-kommunikation och UI-uppdateringar
+ * main poker planning client module
+ * coordinates websocket and ui updates
  */
 
 import { SocketManager } from './socket.js';
@@ -8,35 +8,35 @@ import { UIManager } from './ui.js';
 import { i18n } from './i18n.js';
 import ThemeManager from './themeManager.js';
 
-// Initiera managers
+// initialize managers
 const socketManager = new SocketManager();
 const uiManager = new UIManager();
 
 /**
- * Initialiserar applikationen
+ * initializes application
  */
 function init() {
-    // Anslut till WebSocket-server
+    // connect to websocket server
     socketManager.connect();
 
-    // Sätt upp event-lyssnare för UI
+    // setup ui event listeners
     setupUIEventListeners();
 
-    // Sätt upp event-lyssnare för WebSocket
+    // setup websocket event listeners
     setupSocketEventListeners();
 
-    // Initiera översättningar
+    // initialize translations
     i18n.updatePageTranslations();
 
-    // Initiera tema
+    // initialize theme
     ThemeManager.init();
 }
 
 /**
- * Sätter upp UI event-lyssnare
+ * sets up ui event listeners
  */
 function setupUIEventListeners() {
-    // Välkomstskärm - Skapa session
+    // welcome screen - create session
     document.getElementById('create-session-btn').addEventListener('click', async () => {
         const username = document.getElementById('username').value.trim();
         const selectedTheme = document.getElementById('theme-selector').value;
@@ -58,7 +58,7 @@ function setupUIEventListeners() {
         }
     });
 
-    // Välkomstskärm - Gå med i session
+    // welcome screen - join session
     document.getElementById('join-session-btn').addEventListener('click', async () => {
         const username = document.getElementById('username').value.trim();
         const sessionId = document.getElementById('session-id-input').value.trim();
@@ -82,7 +82,7 @@ function setupUIEventListeners() {
         }
     });
 
-    // Enter-tangent för att gå med
+    // enter key to join
     document.getElementById('session-id-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             document.getElementById('join-session-btn').click();
@@ -95,13 +95,13 @@ function setupUIEventListeners() {
         }
     });
 
-    // Starta röstning
+    // start voting
     document.getElementById('start-voting-btn').addEventListener('click', () => {
         const timerMinutes = parseFloat(document.getElementById('timer-duration').value) || 0;
         socketManager.startVoting(timerMinutes);
     });
 
-    // Kortval
+    // card selection
     document.getElementById('cards-container').addEventListener('click', (e) => {
         if (e.target.classList.contains('card')) {
             uiManager.handleCardSelection(e.target);
@@ -111,7 +111,7 @@ function setupUIEventListeners() {
 
 
 
-    // Återställ omröstning (Ny röstning)
+    // reset voting (new round)
     const newRoundBtn = document.getElementById('new-round-btn');
     if (newRoundBtn) {
         newRoundBtn.addEventListener('click', () => {
@@ -119,12 +119,12 @@ function setupUIEventListeners() {
         });
     }
 
-    // Avslöja röster nu (för sessionsskapare)
+    // reveal votes now (for creator)
     document.getElementById('reveal-now-btn').addEventListener('click', () => {
         socketManager.revealVotes();
     });
 
-    // Språkväxlare
+    // language toggle
     document.getElementById('language-toggle').addEventListener('click', () => {
         const currentLang = i18n.getLanguage();
         const newLang = currentLang === 'sv' ? 'en' : 'sv';
@@ -174,7 +174,7 @@ function setupUIEventListeners() {
         }
     });
 
-    // Chat - Skicka meddelande
+    // chat - send message
     const sendChatMessage = () => {
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
@@ -194,10 +194,10 @@ function setupUIEventListeners() {
 }
 
 /**
- * Sätter upp WebSocket event-lyssnare
+ * sets up websocket event listeners
  */
 function setupSocketEventListeners() {
-    // Deltagare uppdaterade
+    // participants updated
     socketManager.on('participants-updated', (participants) => {
         uiManager.updateParticipants(participants, socketManager.isCreator, socketManager.userId);
 
@@ -215,29 +215,29 @@ function setupSocketEventListeners() {
         }
     });
 
-    // Röstning startad
+    // voting started
     socketManager.on('voting-started', (data) => {
         uiManager.showVotingArea(data.timerDuration, data.timerStartedAt, socketManager.isCreator);
     });
 
-    // Användare har röstat
+    // user has voted
     socketManager.on('user-voted', (data) => {
         uiManager.markUserVoted(data.userId);
 
-        // Uppdatera reveal-kontroller om användaren är sessionsskapare
+        // update reveal controls if user is creator
         if (socketManager.isCreator && data.totalVotes !== undefined) {
             uiManager.updateRevealControls(data.allVoted, data.totalVotes, data.totalParticipants);
         }
     });
 
-    // Röster avslöjade
+    // votes revealed
     socketManager.on('votes-revealed', (results) => {
         uiManager.showResults(results);
     });
 
-    // Förklaring inskickad
+    // explanation submitted
     socketManager.on('explanation-submitted', (data) => {
-        // Hitta användarnamn från deltagarlistan
+        // find username from participant list
         const participantItem = document.querySelector(`[data-user-id="${data.userId}"]`);
         const username = participantItem ?
             participantItem.textContent.replace('👤', '').trim().replace('✓', '').trim() :
@@ -246,36 +246,36 @@ function setupSocketEventListeners() {
         uiManager.addExplanation(data.userId, username, data.explanation);
     });
 
-    // Omröstning återställd
-    // Runda återställd
+    // voting reset
+    // round reset
     socketManager.on('round-reset', (data) => {
         uiManager.resetView();
 
-        // Visa timer-kontroller igen för skaparen så hen kan starta ny röstning
+        // show timer controls for creator to start new voting
         if (socketManager.isCreator) {
             document.getElementById('timer-controls').classList.remove('hidden');
         }
 
-        // Visa väntmeddelande för deltagare tills skaparen startar röstningen
+        // show waiting message until creator starts voting
         if (!socketManager.isCreator) {
             document.getElementById('waiting-message').classList.remove('hidden');
             document.getElementById('voting-area').classList.add('hidden');
         }
     });
 
-    // Kickad från sessionen
+    // kicked from session
     socketManager.on('kicked', () => {
         alert(i18n.t('admin.kicked.message'));
         window.location.reload();
     });
 
-    // Chattmeddelande mottaget
+    // chat message received
     socketManager.on('chat-message', (chatMessage) => {
         console.log('Chat message received:', chatMessage);
         uiManager.addChatMessage(chatMessage);
     });
 
-    // Chatthistorik mottagen
+    // chat history received
     socketManager.on('chat-history', (messages) => {
         console.log('Chat history received:', messages);
         messages.forEach(msg => uiManager.addChatMessage(msg));
@@ -294,7 +294,7 @@ function setupSocketEventListeners() {
     });
 }
 
-// Starta applikationen när DOM är laddad
+// start application when dom is loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
