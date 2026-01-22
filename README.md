@@ -5,6 +5,8 @@ Poker planning app in node.
 
 [@mattische](https://github.com/mattische)
 
+[Docker Hub](https://hub.docker.com/repository/docker/mattische/pokipoki/general)
+
 ## Get up and running
 
 ### install
