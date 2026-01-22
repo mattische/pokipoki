@@ -1,5 +1,9 @@
-<your domain or ip here> {
-    reverse_proxy poker-planning:3000
+# DOMAIN specified in .env
+{$DOMAIN} {
+    # must match port in Dockerfile or vice versa
+    # this proxies default port 80 to poker-planning on port 3000
+    # PORT specified in .env
+    reverse_proxy poker-planning:{$PORT: 3000} 
     
     # webbsocket for socket.io
     @websockets {

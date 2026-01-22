@@ -7,7 +7,9 @@ Poker planning app in node.
 
 [Docker Hub](https://hub.docker.com/repository/docker/mattische/pokipoki/general)
 
-## Get up and running
+## npm install and run app
+
+*only if you wish to run the app locally*
 
 ### install
 ```bash
@@ -22,17 +24,33 @@ npm install
 npm start
 ```
 
-## docker
+## docker and caddy
 
-_provided docker compose uses settings in .env file (port)._
+### create a Caddyfile
+Create your own Caddyfile - this repo contains an example.
+Make sure to add correct values in ```.env``` such as domain (your servers ip or your domain).  
+Review ```docker-compose.yml``` - especially if you change ports.
+
+Create a JWT_SECRET with for example openssl;
+
+```bash
+openssl rand -base64 32
+```
+
+and copy that to the JWT_SECRET in .env
+
+### docker compose
+
+Probably the easiest way to get up and running is to use docker compose.  
+It runs 2 containers; poker planning app and a caddy server.
+
+The caddy server uses reverse proxy and routes exposed port 80 to app port (default 3000 in production).
+Review settings in ```docker-compose.yml```.
 
 ### docker compose
 ```bash
-# default port as specified in .env
+# uses settings such as port as specified in .env
 docker compose up
-
-# if you want to change port (e.g., 8080)
-APP_PORT=8080 docker compose up
 ```
 
 ### docker
