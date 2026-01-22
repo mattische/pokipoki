@@ -1,8 +1,8 @@
 services:
   poker-planning: 
-    image: mattische/pokipoki:latest  # Använd pushad image från Docker Hub
-    # build: .  # Avkommentera för att bygga lokalt istället
-    pull_policy: always  # Hämta alltid senaste versionen
+    image: mattische/pokipoki:latest  # pushad image n Docker Hub
+    # build: .  # uncomment if building locally instead
+    pull_policy: always  # always latest version
     container_name: pokipoki
     expose:
       - "3000"
@@ -33,9 +33,9 @@ services:
     depends_on:
       - poker-planning
 
-  # Development service med volume mapping
+  # Development service with volume mapping
   poker-planning-dev: 
-    build: .  # Dev bygger alltid lokalt
+    build: .  # builds locally for development
     container_name: pokipoki-dev
     ports:
       - "3001:3000"
