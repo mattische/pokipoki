@@ -1,0 +1,9 @@
+<your domain or ip here> {
+    reverse_proxy poker-planning:3000
+    
+    # webbsocket for socket.io
+    @websockets {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+}

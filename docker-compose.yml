@@ -1,28 +1,44 @@
 services:
-  poker-planning:
-    build: .
+  poker-planning: 
+    image: mattische/pokipoki:latest  # Använd pushad image från Docker Hub
+    # build: .  # Avkommentera för att bygga lokalt istället
+    pull_policy: always  # Hämta alltid senaste versionen
     container_name: pokipoki
-    ports:
-      - "${PORT:-1337}:1337"  # Host:Container
-    environment:
+    expose:
+      - "3000"
+    environment: 
       - NODE_ENV=${NODE_ENV:-production}
-      - PORT=1337  # Fast intern port
+      - PORT=3000
       - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped
+    networks: 
+      - pokipoki-network
+
+  caddy:
+    image:  caddy:2-alpine
+    container_name: pokipoki-caddy
+    restart:  unless-stopped
+    ports: 
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment: 
+      - DOMAIN=${DOMAIN:-pokerplanning. duckdns.org}
+    networks:
+      - pokipoki-network
+    depends_on:
+      - poker-planning
 
   # Development service med volume mapping
-  poker-planning-dev:
-    build: .
+  poker-planning-dev: 
+    build: .  # Dev bygger alltid lokalt
     container_name: pokipoki-dev
     ports:
       - "3001:3000"
     environment:
       - NODE_ENV=development
-      - PORT=3000
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-      - ./server.js:/app/server.js
-    restart: unless-stopped
-    profiles:
-      - dev
+      - PORT=3
