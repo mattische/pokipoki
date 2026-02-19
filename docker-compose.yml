@@ -1,4 +1,5 @@
 services:
+<<<<<<< HEAD
   poker-planning: 
     image: mattische/pokipoki:latest  # image from Docker Hub
     # build: .   # uncomment if building locally instead
@@ -7,10 +8,20 @@ services:
     expose: 
       - "${PORT:-3000}"  # port from .env, must match Caddyfile
     environment: 
+=======
+  poker-planning:
+    image: mattische/pokipoki:latest
+    pull_policy: always
+    container_name: pokipoki
+    expose:
+      - "3000"
+    environment:
+>>>>>>> e3865d7 (updated network)
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=${PORT:-3000}  # port from .env (default 3000)
       - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped
+<<<<<<< HEAD
     networks: 
       - pokipoki-network
 
@@ -29,26 +40,37 @@ services:
     environment: 
       - DOMAIN=${DOMAIN:-pokerplanning. duckdns.org}
       - PORT=${PORT:-3000}  # pass PORT to Caddy for reverse proxy
+=======
+>>>>>>> e3865d7 (updated network)
     networks:
       - pokipoki-network
-    depends_on:
-      - poker-planning
+      - web
 
+<<<<<<< HEAD
   # Development service with volume mapping
   poker-planning-dev: 
     build: .  # builds locally for development
+=======
+  poker-planning-dev:
+    build: .
+>>>>>>> e3865d7 (updated network)
     container_name: pokipoki-dev
     ports:
       - "3001:${PORT:-3000}"  # expose dev server on port 3001
     environment:
       - NODE_ENV=development
+<<<<<<< HEAD
       - PORT=${PORT:-3000}
+=======
+      - PORT=3000
+>>>>>>> e3865d7 (updated network)
       - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./src:/app/src
       - ./public:/app/public
       - ./server.js:/app/server.js
     restart: unless-stopped
+<<<<<<< HEAD
     profiles: 
       - dev
 
@@ -59,3 +81,14 @@ networks:
 volumes:  
   caddy_data: 
   caddy_config: 
+=======
+    profiles:
+      - dev
+
+networks:
+    pokipoki-network:
+      driver: bridge
+    web:
+      external: true
+      name: web
+>>>>>>> e3865d7 (updated network)

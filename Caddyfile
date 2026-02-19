@@ -1,3 +1,4 @@
+<<<<<<< HEAD:CaddyFile_example
 # DOMAIN specified in .env
 {$DOMAIN} {
     # must match port in Dockerfile or vice versa
@@ -5,6 +6,11 @@
     # PORT specified in .env
     reverse_proxy poker-planning:{$PORT: 3000} 
     
+=======
+{$DOMAIN} {
+    reverse_proxy poker-planning:3000
+
+>>>>>>> e3865d7 (updated network):Caddyfile
     # webbsocket for socket.io
     @websockets {
         header Connection *Upgrade*
