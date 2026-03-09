@@ -118,6 +118,17 @@ export function setupSocketHandlers(io) {
                         roundNumber: session.currentRound.roundNumber,
                         deckType: session.deckType || 'fibonacci'
                     });
+
+                    if (session.currentRound.revealed) {
+                        const results = {
+                            votes: Array.from(session.currentRound.votes.entries()).map(([userId, vote]) => ({
+                                userId,
+                                username: session.participants.get(userId)?.username || 'Unknown',
+                                vote
+                            }))
+                        };
+                        socket.emit('votes-revealed', results);
+                    }
                 }
 
                 // send chat history to new joiner
