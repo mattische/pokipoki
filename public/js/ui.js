@@ -74,12 +74,14 @@ export class UIManager {
             const kickBtn = isCreator && p.id !== currentUserId
                 ? `<button class="kick-btn" data-kick-user-id="${p.id}">${i18n.t('admin.kick.button')}</button>`
                 : '';
+            const displayName = p.username.length > 10 ? p.username.slice(0, 10) + '…' : p.username;
+            const titleAttr = p.username.length > 10 ? `title="${p.username}"` : '';
 
             return `
                 <div class="participant-item ${hostClass}" data-user-id="${p.id}">
-                    <span class="participant-name">👤 ${p.username}${hostBadge}</span>
+                    <span class="participant-name" ${titleAttr}>👤 ${displayName}${hostBadge}</span>
                     <div class="participant-actions">
-                        <span class="voted-badge" data-i18n="participant.voted">${i18n.t('participant.voted')}</span>
+                        <span class="voted-badge">${i18n.t('participant.voted')}</span>
                         ${kickBtn}
                     </div>
                 </div>
