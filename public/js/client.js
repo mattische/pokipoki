@@ -7,6 +7,7 @@ import { SocketManager } from './socket.js';
 import { UIManager } from './ui.js';
 import { i18n } from './i18n.js';
 import ThemeManager from './themeManager.js';
+import { DECKS, DEFAULT_DECK } from './decks.js';
 
 // initialize managers
 const socketManager = new SocketManager();
@@ -36,10 +37,30 @@ function init() {
  * sets up ui event listeners
  */
 function setupUIEventListeners() {
+    // deck selector on welcome screen
+    const deckSelector = document.getElementById('deck-selector');
+    const deckDescEl = document.getElementById('deck-description');
+    const deckPreviewEl = document.getElementById('deck-preview');
+
+    const updateDeckDescription = () => {
+        const deckId = deckSelector.value;
+        const deck = DECKS[deckId];
+        if (deck) {
+            deckDescEl.textContent = i18n.t(deck.descKey);
+            deckPreviewEl.innerHTML = deck.cards
+                .map(card => `<span class="deck-preview-card">${card.value}</span>`)
+                .join('');
+        }
+    };
+
+    deckSelector.addEventListener('change', updateDeckDescription);
+    updateDeckDescription();
+
     // welcome screen - create session
     document.getElementById('create-session-btn').addEventListener('click', async () => {
         const username = document.getElementById('username').value.trim();
         const selectedTheme = document.getElementById('theme-selector').value;
+        const selectedDeck = deckSelector.value || DEFAULT_DECK;
 
         if (!username) {
             uiManager.showError(i18n.t('error.name.required'));
@@ -50,7 +71,7 @@ function setupUIEventListeners() {
         ThemeManager.applyTheme(selectedTheme);
 
         try {
-            const response = await socketManager.createSession(username, selectedTheme);
+            const response = await socketManager.createSession(username, selectedTheme, selectedDeck);
             uiManager.showScreen('planning');
             uiManager.displaySessionInfo(response.sessionId, username, response.isCreator);
         } catch (error) {
@@ -109,6 +130,26 @@ function setupUIEventListeners() {
         }
     });
 
+    // card description on hover
+    const cardsContainer = document.getElementById('cards-container');
+    const descriptionPanel = document.getElementById('card-description-panel');
+
+    cardsContainer.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('card')) {
+            const key = e.target.dataset.descKey;
+            if (key) {
+                descriptionPanel.textContent = i18n.t(key);
+                descriptionPanel.classList.add('visible');
+            }
+        }
+    });
+
+    cardsContainer.addEventListener('mouseout', (e) => {
+        if (e.target.classList.contains('card')) {
+            descriptionPanel.classList.remove('visible');
+        }
+    });
+
 
 
     // reset voting (new round)
@@ -133,9 +174,15 @@ function setupUIEventListeners() {
 
     // End session button
     document.getElementById('end-session-btn').addEventListener('click', () => {
-        const confirmMessage = i18n.getLanguage() === 'sv'
-            ? 'Är du säker på att du vill avsluta sessionen? Alla deltagare kommer att kopplas från.'
-            : 'Are you sure you want to end the session? All participants will be disconnected.';
+        const participantCount = parseInt(document.getElementById('participant-count').textContent, 10) || 0;
+        const othersCount = participantCount - 1; // exclude host
+
+        let confirmMessage;
+        if (othersCount > 0) {
+            confirmMessage = i18n.t('session.end.confirm.participants').replace('{n}', othersCount);
+        } else {
+            confirmMessage = i18n.t('session.end.confirm');
+        }
 
         if (confirm(confirmMessage)) {
             socketManager.socket.emit('end-session');
@@ -145,26 +192,12 @@ function setupUIEventListeners() {
     // Copy session ID button
     document.getElementById('copy-session-id-btn').addEventListener('click', async () => {
         const sessionId = document.getElementById('session-id-display').textContent;
+        const btn = document.getElementById('copy-session-id-btn');
+        const label = btn.querySelector('.session-id-copy-label');
 
         try {
             await navigator.clipboard.writeText(sessionId);
-
-            // Visual feedback
-            const btn = document.getElementById('copy-session-id-btn');
-            const originalText = btn.textContent;
-            btn.textContent = '✓';
-            btn.style.color = '#4CAF50';
-
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.color = '';
-            }, 2000);
-
-            // Optional: Show toast message
-            console.log(i18n.t('session.copy.success'));
         } catch (err) {
-            console.error('Failed to copy:', err);
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = sessionId;
             document.body.appendChild(textArea);
@@ -172,6 +205,14 @@ function setupUIEventListeners() {
             document.execCommand('copy');
             document.body.removeChild(textArea);
         }
+
+        const originalText = label.textContent;
+        label.textContent = '✓ ' + i18n.t('session.copy.success');
+        btn.classList.add('copied');
+        setTimeout(() => {
+            label.textContent = originalText;
+            btn.classList.remove('copied');
+        }, 2000);
     });
 
     // chat - send message
@@ -217,7 +258,7 @@ function setupSocketEventListeners() {
 
     // voting started
     socketManager.on('voting-started', (data) => {
-        uiManager.showVotingArea(data.timerDuration, data.timerStartedAt, socketManager.isCreator);
+        uiManager.showVotingArea(data.timerDuration, data.timerStartedAt, socketManager.isCreator, data.deckType);
     });
 
     // user has voted

@@ -33,11 +33,12 @@ export class SocketManager {
     /**
      * creates new session
      */
-    createSession(username, theme = 'modern') {
+    createSession(username, theme = 'modern', deckType = 'fibonacci') {
         return new Promise((resolve, reject) => {
             this.socket.emit('join-session', {
                 username,
                 theme,
+                deckType,
                 create: true
             }, (response) => {
                 if (response.success) {

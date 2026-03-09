@@ -13,14 +13,15 @@ const sessions = new Map();
  * @param {string} creatorName - creator name
  * @returns {Object} session object with sessionId and token
  */
-export function createSession(creatorName, theme = 'modern') {
+export function createSession(creatorName, theme = 'modern', deckType = 'fibonacci') {
     const sessionId = generateSessionId();
 
     const session = {
         id: sessionId,
         createdAt: new Date(),
         creatorId: null, // set when creator joins
-        theme: theme, // Store selected theme
+        theme: theme,
+        deckType: deckType,
         participants: new Map(),
         currentRound: {
             active: false,

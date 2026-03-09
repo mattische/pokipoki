@@ -60,6 +60,7 @@ const translations = {
         // Admin
         'admin.kick.button': 'Kicka',
         'admin.kicked.message': 'Du har blivit utkastad från sessionen',
+        'participant.voted': 'Röstat',
 
         // Chat
         'chat.heading': 'Chat',
@@ -72,10 +73,70 @@ const translations = {
         // Session
         'session.id.label': 'ID:',
         'session.copy.success': 'Session-ID kopierat!',
-        'session.copy.button': 'Kopiera ID',
-        'session.end.button': 'Avslutan',
+        'session.copy.button': 'Kopiera session-ID',
+        'session.end.button': 'Avsluta session',
+        'session.end.confirm': 'Är du säker? Alla deltagare kommer att kopplas från.',
+        'session.end.confirm.participants': 'Det finns fortfarande {n} deltagare i sessionen. Är du säker på att du vill avsluta?',
         'session.ended.title': 'Sessionen har avslutats',
         'session.ended.message': 'Host har avslutat sessionen.',
+
+        // Deck selector
+        'voting.deck.label': 'Kortlek',
+        'deck.fibonacci.name': 'Fibonacci',
+        'deck.fibonacci.desc': 'Klassisk Fibonacci-sekvens (0–89) plus specialkort. Bäst för team som vill ha fin detaljnivå på stora estimat.',
+        'deck.modified.name': 'Modified Fibonacci',
+        'deck.modified.desc': 'Modifierad Fibonacci med runda tal (20, 40, 100) för stora estimat. Vanligast i industrin.',
+        'deck.tshirt.name': 'T-shirt Sizes',
+        'deck.tshirt.desc': 'Storleksbaserade estimat (XS–XL). Bra när teamet undviker siffror och tänker relativt.',
+        'deck.powers2.name': 'Powers of 2',
+        'deck.powers2.desc': 'Tvåpotenser (0–64). Betonar att varje steg är dubbelt så stort – bra för tekniska team.',
+
+        // Fibonacci card descriptions
+        'card.fib.0': '0 — Ingen insats. Uppgiften är redan klar eller behöver bara verifieras.',
+        'card.fib.1': '1 — Trivial. Helt välförstådd, inga frågetecken alls.',
+        'card.fib.2': '2 — Liten uppgift med minimal risk och osäkerhet.',
+        'card.fib.3': '3 — Lite komplexare än en 2:a, med viss osäkerhet.',
+        'card.fib.5': '5 — Medelstor. Kräver planering och har några okända delar.',
+        'card.fib.8': '8 — Komplex uppgift med flera okända faktorer eller beroenden.',
+        'card.fib.13': '13 — Stor och komplex. Överväg att dela upp den i mindre delar.',
+        'card.fib.21': '21 — Mycket stor uppgift med hög osäkerhet. Bör brytas ned.',
+        'card.fib.34': '34 — Episk storlek. Minst en hel sprint – måste troligen delas upp.',
+        'card.fib.55': '55 — Extremt stor. Svårt att estimera exakt på sprint-nivå.',
+        'card.fib.89': '89 — För stor för att estimeras meningsfullt. Dela upp innan nästa runda.',
+
+        // Modified Fibonacci card descriptions
+        'card.mod.0': '0 — Ingen insats. Uppgiften är redan klar.',
+        'card.mod.half': '½ — Nästan ingenting. En liten buggrättning eller textändring.',
+        'card.mod.2': '2 — Liten uppgift, välförstådd och låg risk.',
+        'card.mod.3': '3 — Liten med lite osäkerhet.',
+        'card.mod.5': '5 — Medelstor. Kräver planering, lite okänt.',
+        'card.mod.8': '8 — Komplex, flera okända faktorer.',
+        'card.mod.13': '13 — Stor och komplex – överväg att dela upp.',
+        'card.mod.20': '20 — Mycket stor. Troligen mer än en sprint.',
+        'card.mod.40': '40 — Episk storlek. Kräver nedbrytning innan den kan genomföras.',
+        'card.mod.100': '100 — Mega-episk. Omöjlig att estimera eller genomföra som helhet.',
+
+        // T-shirt card descriptions
+        'card.tshirt.xs': 'XS — Extra small. Några timmar, max en halv dag.',
+        'card.tshirt.s': 'S — Small. Ungefär en dag.',
+        'card.tshirt.m': 'M — Medium. Ungefär halva sprinten.',
+        'card.tshirt.l': 'L — Large. Ungefär en hel sprint.',
+        'card.tshirt.xl': 'XL — Extra large. Mer än en sprint – bör delas upp.',
+
+        // Powers of 2 card descriptions
+        'card.pow2.0': '0 — Ingen insats. Uppgiften är redan klar.',
+        'card.pow2.1': '1 — Minimal insats. Trivialt liten uppgift.',
+        'card.pow2.2': '2 — Liten uppgift.',
+        'card.pow2.4': '4 — Liten-medel med lite osäkerhet.',
+        'card.pow2.8': '8 — Medelstor, kräver planering.',
+        'card.pow2.16': '16 — Stor. Nästan en hel sprint.',
+        'card.pow2.32': '32 — Mycket stor. Kräver nedbrytning.',
+        'card.pow2.64': '64 — Episk. Omöjlig att genomföra utan att delas upp.',
+
+        // Special cards (shared across decks)
+        'card.special.unknown': '? — Kan inte estimera. Behöver mer information eller diskussion innan rundan fortsätter.',
+        'card.special.coffee': '☕ — Paus! Gruppen behöver en stunds återhämtning innan vi fortsätter.',
+        'card.special.inf': '∞ — Oändlig. Uppgiften är för stor eller oklar – den måste delas upp.',
     },
     en: {
         // Welcome Screen
@@ -133,6 +194,7 @@ const translations = {
         // Admin
         'admin.kick.button': 'Kick',
         'admin.kicked.message': 'You have been kicked from the session',
+        'participant.voted': 'Voted',
 
         // Chat
         'chat.heading': 'Chat',
@@ -146,9 +208,69 @@ const translations = {
         'session.id.label': 'ID:',
         'session.copy.success': 'Session ID copied!',
         'session.copy.button': 'Copy Session ID',
-        'session.end.button': 'End',
+        'session.end.button': 'End session',
+        'session.end.confirm': 'Are you sure? All participants will be disconnected.',
+        'session.end.confirm.participants': 'There are still {n} participants in the session. Are you sure you want to end it?',
         'session.ended.title': 'Session has ended',
         'session.ended.message': 'The session host has ended the session.',
+
+        // Deck selector
+        'voting.deck.label': 'Card deck',
+        'deck.fibonacci.name': 'Fibonacci',
+        'deck.fibonacci.desc': 'Classic Fibonacci sequence (0–89) plus special cards. Best for teams wanting fine-grained detail on large estimates.',
+        'deck.modified.name': 'Modified Fibonacci',
+        'deck.modified.desc': 'Modified Fibonacci with round numbers (20, 40, 100) for large estimates. Most common in the industry.',
+        'deck.tshirt.name': 'T-shirt Sizes',
+        'deck.tshirt.desc': 'Size-based estimates (XS–XL). Great when teams want to think relatively instead of in numbers.',
+        'deck.powers2.name': 'Powers of 2',
+        'deck.powers2.desc': 'Powers of two (0–64). Emphasizes that each step is twice as large — good for technical teams.',
+
+        // Fibonacci card descriptions
+        'card.fib.0': '0 — No effort. The task is already done or just needs verification.',
+        'card.fib.1': '1 — Trivial. Completely understood, no unknowns.',
+        'card.fib.2': '2 — Small task with minimal risk and uncertainty.',
+        'card.fib.3': '3 — Slightly more complex than a 2, with some uncertainty.',
+        'card.fib.5': '5 — Medium. Requires planning, has a few unknowns.',
+        'card.fib.8': '8 — Complex task with several unknowns or dependencies.',
+        'card.fib.13': '13 — Large and complex. Consider splitting into smaller parts.',
+        'card.fib.21': '21 — Very large with high uncertainty. Should be broken down.',
+        'card.fib.34': '34 — Epic size. At least a full sprint — likely needs splitting.',
+        'card.fib.55': '55 — Extremely large. Hard to estimate accurately at sprint level.',
+        'card.fib.89': '89 — Too large to estimate meaningfully. Split before the next round.',
+
+        // Modified Fibonacci card descriptions
+        'card.mod.0': '0 — No effort. The task is already done.',
+        'card.mod.half': '½ — Almost nothing. A tiny bug fix or text change.',
+        'card.mod.2': '2 — Small task, well understood and low risk.',
+        'card.mod.3': '3 — Small with some uncertainty.',
+        'card.mod.5': '5 — Medium. Requires planning, some unknowns.',
+        'card.mod.8': '8 — Complex, several unknowns.',
+        'card.mod.13': '13 — Large and complex — consider splitting.',
+        'card.mod.20': '20 — Very large. Likely more than one sprint.',
+        'card.mod.40': '40 — Epic size. Needs breaking down before it can be done.',
+        'card.mod.100': '100 — Mega-epic. Impossible to estimate or execute as a whole.',
+
+        // T-shirt card descriptions
+        'card.tshirt.xs': 'XS — Extra small. A few hours, at most half a day.',
+        'card.tshirt.s': 'S — Small. About one day.',
+        'card.tshirt.m': 'M — Medium. About half a sprint.',
+        'card.tshirt.l': 'L — Large. About a full sprint.',
+        'card.tshirt.xl': 'XL — Extra large. More than one sprint — should be split.',
+
+        // Powers of 2 card descriptions
+        'card.pow2.0': '0 — No effort. The task is already done.',
+        'card.pow2.1': '1 — Minimal effort. Trivially small task.',
+        'card.pow2.2': '2 — Small task.',
+        'card.pow2.4': '4 — Small-medium with some uncertainty.',
+        'card.pow2.8': '8 — Medium, requires planning.',
+        'card.pow2.16': '16 — Large. Almost a full sprint.',
+        'card.pow2.32': '32 — Very large. Needs breaking down.',
+        'card.pow2.64': '64 — Epic. Cannot be done without being split up.',
+
+        // Special cards (shared across decks)
+        'card.special.unknown': '? — Cannot estimate. Needs more information or discussion before the round continues.',
+        'card.special.coffee': '☕ — Break time! The group needs a short rest before continuing.',
+        'card.special.inf': '∞ — Infinite. The task is too large or unclear — it must be split up.',
     }
 };
 

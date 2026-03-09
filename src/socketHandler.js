@@ -55,7 +55,8 @@ export function setupSocketHandlers(io) {
             if (create || !sessionId) {
                 // create new session
                 const theme = data.theme || 'modern';
-                const { sessionId: newSessionId } = createSession(username, theme);
+                const deckType = data.deckType || 'fibonacci';
+                const { sessionId: newSessionId } = createSession(username, theme, deckType);
                 const session = getSession(newSessionId);
 
                 joinSession(newSessionId, userId, username);
@@ -114,7 +115,8 @@ export function setupSocketHandlers(io) {
                         timerDuration: session.currentRound.timerDuration,
                         timerStartedAt: session.currentRound.timerStartedAt,
                         revealed: session.currentRound.revealed,
-                        roundNumber: session.currentRound.roundNumber
+                        roundNumber: session.currentRound.roundNumber,
+                        deckType: session.deckType || 'fibonacci'
                     });
                 }
 
@@ -138,7 +140,8 @@ export function setupSocketHandlers(io) {
             io.to(currentSessionId).emit('voting-started', {
                 timerDuration,
                 timerStartedAt: timerDuration > 0 ? new Date() : null,
-                roundNumber: session.currentRound.roundNumber
+                roundNumber: session.currentRound.roundNumber,
+                deckType: session.deckType || 'fibonacci'
             });
 
             // auto reveal if timer is set

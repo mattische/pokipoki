@@ -4,6 +4,7 @@
  */
 
 import { i18n } from './i18n.js';
+import { DECKS, DEFAULT_DECK } from './decks.js';
 
 export class UIManager {
     constructor() {
@@ -70,11 +71,17 @@ export class UIManager {
             const isHost = p.isCreator;
             const hostBadge = isHost ? '<span class="host-badge">HOST</span>' : '';
             const hostClass = isHost ? 'host' : '';
+            const kickBtn = isCreator && p.id !== currentUserId
+                ? `<button class="kick-btn" data-kick-user-id="${p.id}">${i18n.t('admin.kick.button')}</button>`
+                : '';
 
             return `
                 <div class="participant-item ${hostClass}" data-user-id="${p.id}">
-                    👤 ${p.username} ${hostBadge}
-                    ${isCreator && p.id !== currentUserId ? `<button class="kick-btn" data-kick-user-id="${p.id}" title="${i18n.t('admin.kick.button')}">❌</button>` : ''}
+                    <span class="participant-name">👤 ${p.username}${hostBadge}</span>
+                    <div class="participant-actions">
+                        <span class="voted-badge" data-i18n="participant.voted">${i18n.t('participant.voted')}</span>
+                        ${kickBtn}
+                    </div>
                 </div>
             `;
         }).join('');
@@ -93,7 +100,17 @@ export class UIManager {
     /**
      * shows voting area and hides controls
      */
-    showVotingArea(timerDuration, timerStartedAt, isCreator = false, roundInfo = null) {
+    showVotingArea(timerDuration, timerStartedAt, isCreator = false, deckType = DEFAULT_DECK) {
+        // Clear any selection from a previous round
+        this.selectedVote = null;
+
+        // Render cards for the chosen deck
+        const deck = DECKS[deckType] || DECKS[DEFAULT_DECK];
+        const container = document.getElementById('cards-container');
+        container.innerHTML = deck.cards.map(card =>
+            `<button class="card" data-value="${card.value}" data-desc-key="${card.descKey}">${card.value}</button>`
+        ).join('');
+
         // Hide waiting message and controls
         document.getElementById('waiting-message').classList.add('hidden');
         document.getElementById('timer-controls').classList.add('hidden');

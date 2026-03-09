@@ -40,6 +40,18 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label for="deck-selector" data-i18n="voting.deck.label">Kortlek</label>
+          <select id="deck-selector">
+            <option value="fibonacci" data-i18n="deck.fibonacci.name">Fibonacci</option>
+            <option value="modifiedFibonacci" data-i18n="deck.modified.name">Modified Fibonacci</option>
+            <option value="tshirt" data-i18n="deck.tshirt.name">T-shirt Sizes</option>
+            <option value="powers2" data-i18n="deck.powers2.name">Powers of 2</option>
+          </select>
+          <p id="deck-description" class="deck-description"></p>
+          <div id="deck-preview" class="deck-preview"></div>
+        </div>
+
         <div class="button-group">
           <button id="create-session-btn" class="btn btn-primary">
             <span class="btn-icon">✨</span>
@@ -70,14 +82,11 @@
       <div class="header-left">
         <h1 class="app-title">pokipoki</h1>
         <div class="session-info">
-          <div class="session-id-container">
-            <span class="label" data-i18n="session.id.label">ID:</span>
-            <span id="session-id-display" class="session-id"></span>
-            <br><button id="copy-session-id-btn" class="btn-icon-only copy-btn" title="Copy Session ID">
-              copy
-            </button>
-          </div>
-          <button id="end-session-btn" class="btn btn-danger hidden" data-i18n="session.end.button">End Session</button>
+          <button id="copy-session-id-btn" class="session-id-copy-btn">
+            <span id="session-id-display" class="session-id-value"></span>
+            <span class="session-id-copy-label" data-i18n="session.copy.button">Kopiera session-ID</span>
+          </button>
+          <button id="end-session-btn" class="btn btn-danger hidden" data-i18n="session.end.button">Avsluta session</button>
         </div>
       </div>
       <div class="header-right">
@@ -143,21 +152,8 @@
         <!-- Voting cards -->
         <div id="voting-area" class="voting-area hidden">
           <h2 id="round-title" data-i18n="voting.choose.heading">Välj ditt kort</h2>
-          <div class="cards-container" id="cards-container">
-            <button class="card" data-value="0">0</button>
-            <button class="card" data-value="1">1</button>
-            <button class="card" data-value="2">2</button>
-            <button class="card" data-value="3">3</button>
-            <button class="card" data-value="5">5</button>
-            <button class="card" data-value="8">8</button>
-            <button class="card" data-value="13">13</button>
-            <button class="card" data-value="21">21</button>
-            <button class="card" data-value="34">34</button>
-            <button class="card" data-value="55">55</button>
-            <button class="card" data-value="89">89</button>
-            <button class="card" data-value="?">?</button>
-            <button class="card" data-value="∞">∞</button>
-          </div>
+          <div class="cards-container" id="cards-container"></div>
+          <div id="card-description-panel" class="card-description-panel"></div>
           <p class="vote-status" id="vote-status"></p>
 
           <div class="reveal-controls hidden" id="reveal-controls">
