@@ -78,11 +78,25 @@ export class SocketManager {
     }
 
     /**
-     * starts voting round
+     * starts voting round with optional topic
      */
-    startVoting(timerMinutes) {
+    startVoting(timerMinutes, topic = '') {
         const timerDuration = timerMinutes * 60; // convert to seconds
-        this.socket.emit('start-voting', { timerDuration });
+        this.socket.emit('start-voting', { timerDuration, topic });
+    }
+
+    /**
+     * confirms current user has read the round topic
+     */
+    confirmRead() {
+        this.socket.emit('confirm-read');
+    }
+
+    /**
+     * host forces voting to start despite not all having confirmed read
+     */
+    forceStartVoting() {
+        this.socket.emit('force-start-voting');
     }
 
     /**

@@ -100,9 +100,100 @@ export class UIManager {
     }
 
     /**
+     * shows the read phase (topic display + confirmation UI)
+     */
+    showReadPhase(data, isCreator = false) {
+        const { topic, confirmed = 0, total = 0, confirmedNames = [] } = data;
+
+        document.getElementById('waiting-message').classList.add('hidden');
+        document.getElementById('timer-controls').classList.add('hidden');
+        document.getElementById('countdown-overlay').classList.add('hidden');
+
+        const readPhase = document.getElementById('read-phase');
+        readPhase.classList.remove('hidden');
+
+        // render markdown
+        const content = document.getElementById('read-topic-content');
+        content.innerHTML = typeof marked !== 'undefined'
+            ? marked.parse(topic)
+            : topic.replace(/\n/g, '<br>');
+
+        this.updateReadProgress(confirmed, total, confirmedNames);
+
+        // host sees "starta ändå" button
+        const forceBtn = document.getElementById('force-start-btn');
+        if (isCreator) {
+            forceBtn.classList.remove('hidden');
+        } else {
+            forceBtn.classList.add('hidden');
+        }
+    }
+
+    /**
+     * updates the read progress indicators
+     */
+    updateReadProgress(confirmed, total, confirmedNames) {
+        const lang = document.documentElement.lang || 'sv';
+        const progressText = document.getElementById('read-progress-text');
+        const namesEl = document.getElementById('read-confirmed-names');
+
+        if (lang === 'sv' || true) {
+            progressText.textContent = `${confirmed} / ${total} har läst`;
+        }
+
+        namesEl.innerHTML = confirmedNames
+            .map(name => `<span class="read-confirmed-name">✓ ${name}</span>`)
+            .join('');
+    }
+
+    /**
+     * marks the current user's confirm-read button as done
+     */
+    markSelfRead() {
+        const btn = document.getElementById('confirm-read-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
+    }
+
+    /**
+     * hides read phase and shows the 3-2-1 countdown
+     */
+    showCountdown(onDone) {
+        document.getElementById('read-phase').classList.add('hidden');
+        document.getElementById('waiting-message').classList.add('hidden');
+
+        const overlay = document.getElementById('countdown-overlay');
+        const numberEl = document.getElementById('countdown-number');
+        overlay.classList.remove('hidden');
+
+        let count = 3;
+        numberEl.textContent = count;
+        // Re-trigger animation each tick
+        numberEl.style.animation = 'none';
+        void numberEl.offsetWidth;
+        numberEl.style.animation = 'countdownPulse 1s ease-in-out';
+
+        const tick = setInterval(() => {
+            count--;
+            if (count <= 0) {
+                clearInterval(tick);
+                overlay.classList.add('hidden');
+                if (onDone) onDone();
+            } else {
+                numberEl.textContent = count;
+                numberEl.style.animation = 'none';
+                void numberEl.offsetWidth;
+                numberEl.style.animation = 'countdownPulse 1s ease-in-out';
+            }
+        }, 1000);
+    }
+
+    /**
      * shows voting area and hides controls
      */
-    showVotingArea(timerDuration, timerStartedAt, isCreator = false, deckType = DEFAULT_DECK) {
+    showVotingArea(timerDuration, timerStartedAt, isCreator = false, deckType = DEFAULT_DECK, topic = '') {
         // Clear any selection from a previous round
         this.selectedVote = null;
 
@@ -113,9 +204,31 @@ export class UIManager {
             `<button class="card" data-value="${card.value}" data-desc-key="${card.descKey}">${card.value}</button>`
         ).join('');
 
-        // Hide waiting message and controls
+        // Show deck unit badge for hours deck
+        const unitBadge = document.getElementById('deck-unit-badge');
+        if (deck.unit) {
+            unitBadge.textContent = i18n.t('deck.unit.voting').replace('{unit}', deck.nameKey ? i18n.t(deck.nameKey) : deck.id);
+            unitBadge.classList.remove('hidden');
+        } else {
+            unitBadge.classList.add('hidden');
+        }
+
+        // Show topic above cards if present
+        const topicDisplay = document.getElementById('round-topic-display');
+        if (topic) {
+            topicDisplay.innerHTML = typeof marked !== 'undefined'
+                ? marked.parse(topic)
+                : topic.replace(/\n/g, '<br>');
+            topicDisplay.classList.remove('hidden');
+        } else {
+            topicDisplay.classList.add('hidden');
+        }
+
+        // Hide waiting message, read phase, countdown, and controls
         document.getElementById('waiting-message').classList.add('hidden');
         document.getElementById('timer-controls').classList.add('hidden');
+        document.getElementById('read-phase').classList.add('hidden');
+        document.getElementById('countdown-overlay').classList.add('hidden');
 
         // Show voting area
         document.getElementById('voting-area').classList.remove('hidden');
@@ -339,9 +452,18 @@ export class UIManager {
         }
         document.getElementById('reveal-controls').classList.add('hidden');
 
-        // Visa röstningsområde - VÄNTA! Vi visar inte detta förrän röstningen startar
-        // const votingArea = document.getElementById('voting-area');
-        // votingArea.classList.remove('hidden');
+        // Hide read phase, countdown
+        document.getElementById('read-phase').classList.add('hidden');
+        document.getElementById('countdown-overlay').classList.add('hidden');
+        document.getElementById('round-topic-display').classList.add('hidden');
+        document.getElementById('deck-unit-badge').classList.add('hidden');
+
+        // Re-enable confirm-read button for next round
+        const confirmReadBtn = document.getElementById('confirm-read-btn');
+        if (confirmReadBtn) {
+            confirmReadBtn.disabled = false;
+            confirmReadBtn.style.opacity = '';
+        }
 
         // Ensure voting area is hidden
         document.getElementById('voting-area').classList.add('hidden');

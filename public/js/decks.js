@@ -73,6 +73,26 @@ export const DECKS = {
             { value: '?',  descKey: 'card.special.unknown' },
             { value: '☕', descKey: 'card.special.coffee' },
         ]
+    },
+    hours: {
+        id: 'hours',
+        nameKey: 'deck.hours.name',
+        descKey: 'deck.hours.desc',
+        unit: 'h',
+        cards: [
+            { value: '0h',  descKey: 'card.hours.0' },
+            { value: '1h',  descKey: 'card.hours.1' },
+            { value: '2h',  descKey: 'card.hours.2' },
+            { value: '4h',  descKey: 'card.hours.4' },
+            { value: '6h',  descKey: 'card.hours.6' },
+            { value: '8h',  descKey: 'card.hours.8' },
+            { value: '12h', descKey: 'card.hours.12' },
+            { value: '16h', descKey: 'card.hours.16' },
+            { value: '24h', descKey: 'card.hours.24' },
+            { value: '40h', descKey: 'card.hours.40' },
+            { value: '?',   descKey: 'card.special.unknown' },
+            { value: '☕',  descKey: 'card.special.coffee' },
+        ]
     }
 };
 

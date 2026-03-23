@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 </head>
 
 <body>
@@ -47,6 +48,7 @@
             <option value="modifiedFibonacci" data-i18n="deck.modified.name">Modified Fibonacci</option>
             <option value="tshirt" data-i18n="deck.tshirt.name">T-shirt Sizes</option>
             <option value="powers2" data-i18n="deck.powers2.name">Powers of 2</option>
+          <option value="hours" data-i18n="deck.hours.name">Hours</option>
           </select>
           <p id="deck-description" class="deck-description"></p>
           <div id="deck-preview" class="deck-preview"></div>
@@ -127,14 +129,47 @@
         </div>
 
         <div id="timer-controls" class="timer-controls">
-          <div class="timer-input-group">
-            <label for="timer-duration" data-i18n="voting.timer.label">Timer (minuter):</label>
-            <input type="number" id="timer-duration" min="0" max="60" value="2" step="0.5">
+          <div class="topic-input-group">
+            <label for="round-topic" data-i18n="voting.topic.label">Beskrivning (frivillig)</label>
+            <textarea id="round-topic" rows="4" data-i18n-placeholder="voting.topic.placeholder" placeholder="Beskriv vad ni ska rösta på... (stödjer markdown)"></textarea>
+            <div id="topic-preview" class="topic-preview hidden">
+              <div class="topic-preview-label" data-i18n="voting.topic.preview.label">Förhandsvisning</div>
+              <div id="topic-preview-content" class="topic-preview-content"></div>
+            </div>
           </div>
-          <button id="start-voting-btn" class="btn btn-primary">
-            <span class="btn-icon">▶</span>
-            <span data-i18n="voting.start.button">Starta röstning</span>
-          </button>
+          <div class="timer-row">
+            <div class="timer-input-group">
+              <label for="timer-duration" data-i18n="voting.timer.label">Timer (minuter):</label>
+              <input type="number" id="timer-duration" min="0" max="60" value="2" step="0.5">
+            </div>
+            <button id="start-voting-btn" class="btn btn-primary">
+              <span class="btn-icon">▶</span>
+              <span data-i18n="voting.start.button">Starta röstning</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Read phase (shown to all when host provides a topic) -->
+        <div id="read-phase" class="read-phase hidden">
+          <div id="read-topic-content" class="read-topic-content"></div>
+          <div class="read-confirmations">
+            <p id="read-progress-text" class="read-progress-text"></p>
+            <div id="read-confirmed-names" class="read-confirmed-names"></div>
+          </div>
+          <div class="read-actions">
+            <button id="confirm-read-btn" class="btn btn-primary">
+              <span data-i18n="voting.read.confirm">Jag har läst ✓</span>
+            </button>
+            <button id="force-start-btn" class="btn btn-secondary hidden">
+              <span data-i18n="voting.read.forcestart">Starta ändå</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Countdown overlay (3-2-1 before voting starts) -->
+        <div id="countdown-overlay" class="countdown-overlay hidden">
+          <div id="countdown-number" class="countdown-number">3</div>
+          <p class="countdown-label" data-i18n="voting.countdown.label">Röstning börjar...</p>
         </div>
 
         <!-- Timer display -->
@@ -152,6 +187,8 @@
 
         <!-- Voting cards -->
         <div id="voting-area" class="voting-area hidden">
+          <div id="round-topic-display" class="round-topic-display hidden"></div>
+          <div id="deck-unit-badge" class="deck-unit-badge hidden"></div>
           <h2 id="round-title" data-i18n="voting.choose.heading">Välj ditt kort</h2>
           <div class="cards-container" id="cards-container"></div>
           <div id="card-description-panel" class="card-description-panel"></div>

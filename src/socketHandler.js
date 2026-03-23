@@ -10,8 +10,9 @@ import {
     getSession,
     setVote,
     startVoting,
+    confirmRead,
+    activateVoting,
     revealVotes,
-
     resetRound,
     getParticipants,
     sessionExists,
@@ -110,13 +111,25 @@ export function setupSocketHandlers(io) {
                 emitParticipantsUpdate(io, sessionId);
 
                 // send current session status to new joiner
-                if (session && session.currentRound.active) {
+                if (session && session.currentRound.readPhase) {
+                    // in read phase — show topic
+                    const confirmedNames = Array.from(session.currentRound.readConfirmations)
+                        .map(uid => session.participants.get(uid)?.username || 'Unknown');
+                    socket.emit('read-phase-started', {
+                        topic: session.currentRound.topic,
+                        roundNumber: session.currentRound.roundNumber,
+                        confirmed: session.currentRound.readConfirmations.size,
+                        total: session.participants.size,
+                        confirmedNames
+                    });
+                } else if (session && session.currentRound.active) {
                     socket.emit('voting-started', {
                         timerDuration: session.currentRound.timerDuration,
                         timerStartedAt: session.currentRound.timerStartedAt,
                         revealed: session.currentRound.revealed,
                         roundNumber: session.currentRound.roundNumber,
-                        deckType: session.deckType || 'fibonacci'
+                        deckType: session.deckType || 'fibonacci',
+                        topic: session.currentRound.topic || ''
                     });
 
                     if (session.currentRound.revealed) {
@@ -143,24 +156,68 @@ export function setupSocketHandlers(io) {
         socket.on('start-voting', (data) => {
             if (!currentSessionId) return;
 
-            const { timerDuration = 0 } = data;
-            startVoting(currentSessionId, timerDuration);
+            const { timerDuration = 0, topic = '' } = data;
+            startVoting(currentSessionId, timerDuration, topic);
 
             const session = getSession(currentSessionId);
 
-            io.to(currentSessionId).emit('voting-started', {
-                timerDuration,
-                timerStartedAt: timerDuration > 0 ? new Date() : null,
-                roundNumber: session.currentRound.roundNumber,
-                deckType: session.deckType || 'fibonacci'
+            if (topic.trim()) {
+                // read phase first
+                io.to(currentSessionId).emit('read-phase-started', {
+                    topic: topic.trim(),
+                    roundNumber: session.currentRound.roundNumber,
+                    confirmed: 0,
+                    total: session.participants.size,
+                    confirmedNames: []
+                });
+            } else {
+                // no topic — go straight to voting
+                io.to(currentSessionId).emit('voting-started', {
+                    timerDuration,
+                    timerStartedAt: session.currentRound.timerStartedAt,
+                    roundNumber: session.currentRound.roundNumber,
+                    deckType: session.deckType || 'fibonacci',
+                    topic: ''
+                });
+                if (timerDuration > 0) {
+                    setTimeout(() => {
+                        handleRevealVotes(io, currentSessionId);
+                    }, timerDuration * 1000);
+                }
+            }
+        });
+
+        /**
+         * participant confirms they have read the round topic
+         */
+        socket.on('confirm-read', () => {
+            if (!currentSessionId || !currentUserId) return;
+
+            const result = confirmRead(currentSessionId, currentUserId);
+            if (!result) return;
+
+            const session = getSession(currentSessionId);
+
+            io.to(currentSessionId).emit('participant-read', {
+                userId: currentUserId,
+                confirmed: result.confirmed,
+                total: result.total,
+                confirmedNames: result.confirmedNames
             });
 
-            // auto reveal if timer is set
-            if (timerDuration > 0) {
-                setTimeout(() => {
-                    handleRevealVotes(io, currentSessionId);
-                }, timerDuration * 1000);
+            if (result.allConfirmed) {
+                startVotingAfterCountdown(io, currentSessionId);
             }
+        });
+
+        /**
+         * host forces voting to start despite not everyone having read
+         */
+        socket.on('force-start-voting', () => {
+            if (!currentSessionId) return;
+            const session = getSession(currentSessionId);
+            if (!session || session.creatorId !== currentUserId) return;
+            startVotingAfterCountdown(io, currentSessionId);
         });
 
         /**
@@ -310,6 +367,37 @@ export function setupSocketHandlers(io) {
         });
     });
 }
+/**
+ * helper: starts 3-second countdown then activates voting
+ */
+function startVotingAfterCountdown(io, sessionId) {
+    const session = getSession(sessionId);
+    if (!session || session.currentRound.countdownStarted) return;
+    session.currentRound.countdownStarted = true;
+
+    io.to(sessionId).emit('voting-countdown');
+
+    setTimeout(() => {
+        const timerStartedAt = activateVoting(sessionId);
+        const s = getSession(sessionId);
+        if (!s) return;
+
+        io.to(sessionId).emit('voting-started', {
+            timerDuration: s.currentRound.timerDuration,
+            timerStartedAt,
+            roundNumber: s.currentRound.roundNumber,
+            deckType: s.deckType || 'fibonacci',
+            topic: s.currentRound.topic || ''
+        });
+
+        if (s.currentRound.timerDuration > 0) {
+            setTimeout(() => {
+                handleRevealVotes(io, sessionId);
+            }, s.currentRound.timerDuration * 1000);
+        }
+    }, 3000);
+}
+
 /**
  * helper: reveals votes and broadcasts results
  */

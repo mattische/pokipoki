@@ -1,94 +1,60 @@
 services:
-<<<<<<< HEAD
-  poker-planning: 
-    image: mattische/pokipoki:latest  # image from Docker Hub
-    # build: .   # uncomment if building locally instead
-    pull_policy: always  # always fetch latest version
-    container_name:  pokipoki
-    expose: 
-      - "${PORT:-3000}"  # port from .env, must match Caddyfile
-    environment: 
-=======
   poker-planning:
     image: mattische/pokipoki:latest
     pull_policy: always
     container_name: pokipoki
     expose:
-      - "3000"
+      - "${PORT:-3000}"
     environment:
->>>>>>> e3865d7 (updated network)
       - NODE_ENV=${NODE_ENV:-production}
-      - PORT=${PORT:-3000}  # port from .env (default 3000)
+      - PORT=${PORT:-3000}
       - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped
-<<<<<<< HEAD
-    networks: 
+    networks:
       - pokipoki-network
 
-  caddy: 
-    image:  caddy:2-alpine
+  caddy:
+    image: caddy:2-alpine
     container_name: pokipoki-caddy
     restart: unless-stopped
-    ports: 
-      - "80:80"  # default http port
-      - "443:443"  # default https port
-      - "443:443/udp"  # secure http3 proxying
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    environment: 
-      - DOMAIN=${DOMAIN:-pokerplanning. duckdns.org}
-      - PORT=${PORT:-3000}  # pass PORT to Caddy for reverse proxy
-=======
->>>>>>> e3865d7 (updated network)
+    environment:
+      - DOMAIN=${DOMAIN:-pokerplanning.duckdns.org}
+      - PORT=${PORT:-3000}
+    depends_on:
+      - poker-planning
     networks:
       - pokipoki-network
-      - web
 
-<<<<<<< HEAD
-  # Development service with volume mapping
-  poker-planning-dev: 
-    build: .  # builds locally for development
-=======
+  # Development service — start with: docker compose --profile dev up
   poker-planning-dev:
     build: .
->>>>>>> e3865d7 (updated network)
     container_name: pokipoki-dev
     ports:
-      - "3001:${PORT:-3000}"  # expose dev server on port 3001
+      - "3001:${PORT:-3000}"
     environment:
       - NODE_ENV=development
-<<<<<<< HEAD
       - PORT=${PORT:-3000}
-=======
-      - PORT=3000
->>>>>>> e3865d7 (updated network)
       - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./src:/app/src
       - ./public:/app/public
       - ./server.js:/app/server.js
     restart: unless-stopped
-<<<<<<< HEAD
-    profiles: 
-      - dev
-
-networks:  
-  pokipoki-network:  
-    driver: bridge
-
-volumes:  
-  caddy_data: 
-  caddy_config: 
-=======
     profiles:
       - dev
 
 networks:
-    pokipoki-network:
-      driver: bridge
-    web:
-      external: true
-      name: web
->>>>>>> e3865d7 (updated network)
+  pokipoki-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

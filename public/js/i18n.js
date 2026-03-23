@@ -80,6 +80,19 @@ const translations = {
         'session.ended.title': 'Sessionen har avslutats',
         'session.ended.message': 'Host har avslutat sessionen.',
 
+        // Topic input
+        'voting.topic.label': 'Beskrivning (frivillig)',
+        'voting.topic.placeholder': 'Beskriv vad ni ska rösta på... (stödjer markdown)',
+        'voting.topic.preview.label': 'Förhandsvisning',
+
+        // Read phase
+        'voting.read.confirm': 'Jag har läst ✓',
+        'voting.read.forcestart': 'Starta ändå',
+        'voting.countdown.label': 'Röstning börjar...',
+
+        // Deck unit badge
+        'deck.unit.voting': 'Röstar på: {unit}',
+
         // Deck selector
         'voting.deck.label': 'Kortlek',
         'deck.fibonacci.name': 'Fibonacci',
@@ -137,6 +150,20 @@ const translations = {
         'card.special.unknown': '? — Kan inte estimera. Behöver mer information eller diskussion innan rundan fortsätter.',
         'card.special.coffee': '☕ — Paus! Gruppen behöver en stunds återhämtning innan vi fortsätter.',
         'card.special.inf': '∞ — Oändlig. Uppgiften är för stor eller oklar – den måste delas upp.',
+
+        // Hours deck
+        'deck.hours.name': 'Timmar',
+        'deck.hours.desc': 'Rösta på faktiska timmar (0–40h). Tydligt för team som estimerar i tid snarare än story points.',
+        'card.hours.0':  '0h — Redan klart. Ingen åtgärd behövs.',
+        'card.hours.1':  '1h — En timmes arbete. Snabb fix eller liten ändring.',
+        'card.hours.2':  '2h — Några timmars arbete. Väl förstått och avgränsat.',
+        'card.hours.4':  '4h — Ungefär en halv arbetsdag.',
+        'card.hours.6':  '6h — Strax under en hel dag.',
+        'card.hours.8':  '8h — En full arbetsdag.',
+        'card.hours.12': '12h — En och en halv dag. Lite komplexare uppgift.',
+        'card.hours.16': '16h — Två arbetsdagar.',
+        'card.hours.24': '24h — Tre dagar. Överveg att dela upp uppgiften.',
+        'card.hours.40': '40h — En hel arbetsvecka. Bör troligen brytas ned.',
     },
     en: {
         // Welcome Screen
@@ -214,6 +241,19 @@ const translations = {
         'session.ended.title': 'Session has ended',
         'session.ended.message': 'The session host has ended the session.',
 
+        // Topic input
+        'voting.topic.label': 'Description (optional)',
+        'voting.topic.placeholder': 'Describe what you are voting on... (supports markdown)',
+        'voting.topic.preview.label': 'Preview',
+
+        // Read phase
+        'voting.read.confirm': 'I have read it ✓',
+        'voting.read.forcestart': 'Start anyway',
+        'voting.countdown.label': 'Voting starts...',
+
+        // Deck unit badge
+        'deck.unit.voting': 'Voting on: {unit}',
+
         // Deck selector
         'voting.deck.label': 'Card deck',
         'deck.fibonacci.name': 'Fibonacci',
@@ -271,6 +311,20 @@ const translations = {
         'card.special.unknown': '? — Cannot estimate. Needs more information or discussion before the round continues.',
         'card.special.coffee': '☕ — Break time! The group needs a short rest before continuing.',
         'card.special.inf': '∞ — Infinite. The task is too large or unclear — it must be split up.',
+
+        // Hours deck
+        'deck.hours.name': 'Hours',
+        'deck.hours.desc': 'Vote on actual hours (0–40h). Clear for teams that estimate in time rather than story points.',
+        'card.hours.0':  '0h — Already done. No action needed.',
+        'card.hours.1':  '1h — One hour of work. Quick fix or minor change.',
+        'card.hours.2':  '2h — A couple of hours. Well understood and scoped.',
+        'card.hours.4':  '4h — About half a working day.',
+        'card.hours.6':  '6h — Just under a full day.',
+        'card.hours.8':  '8h — One full working day.',
+        'card.hours.12': '12h — A day and a half. Slightly more complex task.',
+        'card.hours.16': '16h — Two working days.',
+        'card.hours.24': '24h — Three days. Consider splitting the task.',
+        'card.hours.40': '40h — A full working week. Likely should be broken down.',
     }
 };
 

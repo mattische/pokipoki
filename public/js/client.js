@@ -116,10 +116,36 @@ function setupUIEventListeners() {
         }
     });
 
+    // live markdown preview for round topic textarea
+    const roundTopicTextarea = document.getElementById('round-topic');
+    const topicPreview = document.getElementById('topic-preview');
+    const topicPreviewContent = document.getElementById('topic-preview-content');
+    roundTopicTextarea.addEventListener('input', () => {
+        const text = roundTopicTextarea.value.trim();
+        if (text && typeof marked !== 'undefined') {
+            topicPreviewContent.innerHTML = marked.parse(text);
+            topicPreview.classList.remove('hidden');
+        } else {
+            topicPreview.classList.add('hidden');
+        }
+    });
+
     // start voting
     document.getElementById('start-voting-btn').addEventListener('click', () => {
         const timerMinutes = parseFloat(document.getElementById('timer-duration').value) || 0;
-        socketManager.startVoting(timerMinutes);
+        const topic = document.getElementById('round-topic').value.trim();
+        socketManager.startVoting(timerMinutes, topic);
+    });
+
+    // confirm read button
+    document.getElementById('confirm-read-btn').addEventListener('click', () => {
+        socketManager.confirmRead();
+        uiManager.markSelfRead();
+    });
+
+    // force start voting (host only)
+    document.getElementById('force-start-btn').addEventListener('click', () => {
+        socketManager.forceStartVoting();
     });
 
     // card selection
@@ -256,9 +282,31 @@ function setupSocketEventListeners() {
         }
     });
 
+    // read phase started (host sent a topic)
+    socketManager.on('read-phase-started', (data) => {
+        uiManager.showReadPhase(data, socketManager.isCreator);
+    });
+
+    // a participant confirmed they read
+    socketManager.on('participant-read', (data) => {
+        uiManager.updateReadProgress(data.confirmed, data.total, data.confirmedNames);
+    });
+
+    // countdown before voting starts
+    socketManager.on('voting-countdown', () => {
+        uiManager.showCountdown(() => {
+            // voting-started will arrive from server ~3s after voting-countdown
+        });
+    });
+
     // voting started
     socketManager.on('voting-started', (data) => {
-        uiManager.showVotingArea(data.timerDuration, data.timerStartedAt, socketManager.isCreator, data.deckType);
+        uiManager.showVotingArea(data.timerDuration, data.timerStartedAt, socketManager.isCreator, data.deckType, data.topic || '');
+        // clear topic textarea after round starts (for next round)
+        if (socketManager.isCreator) {
+            document.getElementById('round-topic').value = '';
+            document.getElementById('topic-preview').classList.add('hidden');
+        }
     });
 
     // user has voted

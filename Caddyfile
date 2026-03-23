@@ -1,17 +1,7 @@
-<<<<<<< HEAD:CaddyFile_example
-# DOMAIN specified in .env
 {$DOMAIN} {
-    # must match port in Dockerfile or vice versa
-    # this proxies default port 80 to poker-planning on port 3000
-    # PORT specified in .env
-    reverse_proxy poker-planning:{$PORT: 3000} 
-    
-=======
-{$DOMAIN} {
-    reverse_proxy poker-planning:3000
+    reverse_proxy poker-planning:{$PORT:3000}
 
->>>>>>> e3865d7 (updated network):Caddyfile
-    # webbsocket for socket.io
+    # websocket support for socket.io
     @websockets {
         header Connection *Upgrade*
         header Upgrade websocket

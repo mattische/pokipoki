@@ -121,34 +121,77 @@ export function setVote(sessionId, userId, vote) {
 }
 
 /**
- * starts new voting round with timer
+ * starts new voting round with timer and optional topic
  * @param {string} sessionId - session id
  * @param {number} timerDuration - timer in seconds (0 = no timer)
+ * @param {string} topic - optional markdown topic text
  * @returns {boolean} true if successful
  */
-export function startVoting(sessionId, timerDuration = 0) {
+export function startVoting(sessionId, timerDuration = 0, topic = '') {
     const session = sessions.get(sessionId);
     if (!session) {
         return false;
     }
 
     const nextRoundNumber = (session.currentRound.roundNumber || 0) + 1;
+    const hasReadPhase = topic.trim().length > 0;
 
     session.currentRound = {
-        active: true,
+        active: !hasReadPhase, // stays inactive until read phase completes
         roundNumber: nextRoundNumber,
         votes: new Map(),
         revealed: false,
         timer: null,
         timerDuration,
-        timerStartedAt: timerDuration > 0 ? new Date() : null,
+        timerStartedAt: hasReadPhase ? null : (timerDuration > 0 ? new Date() : null),
+        topic: topic.trim(),
+        readConfirmations: new Set(),
+        readPhase: hasReadPhase,
+        countdownStarted: false,
         discussionPhase: false,
         currentSpeaker: null,
         explanations: new Map()
     };
 
-    console.log(`Voting started in session ${sessionId}, round: ${nextRoundNumber}, timer: ${timerDuration}s`);
+    console.log(`Round started in session ${sessionId}, round: ${nextRoundNumber}, timer: ${timerDuration}s, readPhase: ${hasReadPhase}`);
     return true;
+}
+
+/**
+ * confirms a participant has read the round topic
+ * @param {string} sessionId - session id
+ * @param {string} userId - user id
+ * @returns {Object|null} read confirmation state
+ */
+export function confirmRead(sessionId, userId) {
+    const session = sessions.get(sessionId);
+    if (!session || !session.currentRound.readPhase) return null;
+
+    session.currentRound.readConfirmations.add(userId);
+
+    const confirmed = session.currentRound.readConfirmations.size;
+    const total = session.participants.size;
+    const confirmedNames = Array.from(session.currentRound.readConfirmations)
+        .map(uid => session.participants.get(uid)?.username || 'Unknown');
+
+    return { confirmed, total, allConfirmed: confirmed >= total, confirmedNames };
+}
+
+/**
+ * activates voting after read phase / countdown
+ * @param {string} sessionId - session id
+ * @returns {Date|null} timerStartedAt
+ */
+export function activateVoting(sessionId) {
+    const session = sessions.get(sessionId);
+    if (!session) return null;
+
+    session.currentRound.active = true;
+    session.currentRound.readPhase = false;
+    if (session.currentRound.timerDuration > 0) {
+        session.currentRound.timerStartedAt = new Date();
+    }
+    return session.currentRound.timerStartedAt;
 }
 
 /**
@@ -188,6 +231,7 @@ export function resetRound(sessionId) {
     if (session.currentRound.revealed && session.currentRound.votes.size > 0) {
         const roundSummary = {
             roundNumber: session.currentRound.roundNumber,
+            topic: session.currentRound.topic || '',
             votes: Array.from(session.currentRound.votes.entries()).map(([userId, vote]) => ({
                 userId,
                 username: session.participants.get(userId)?.username || 'Unknown',
