@@ -5,7 +5,18 @@ Poker planning app in node.
 
 [@mattische](https://github.com/mattische)
 
-[Docker Hub](https://hub.docker.com/repository/docker/mattische/pokipoki/general)
+[Docker Hub](https://hub.docker.com/repository/docker/mattische/pokipoki/general) | [GitHub Packages (ghcr.io)](https://ghcr.io/mattische/mattische-repos/pokipoki)
+
+## Deploy with ONCE
+
+The easiest way to self-host pokipoki is via [ONCE CLI](https://github.com/basecamp/once).
+
+When prompted for a Docker image, enter:
+```
+ghcr.io/mattische/mattische-repos/pokipoki:latest
+```
+
+The app serves HTTP on port 80 and exposes a `/up` health check endpoint as required by ONCE.
 
 ## npm install and run app
 
@@ -89,7 +100,7 @@ docker run --rm -p 3000:3000 pokipoki
 
 ## env variables
 
-- `PORT` - server port (default: 3000)
+- `PORT` - server port (default: 80 in production)
 - `NODE_ENV` - environment (development/production)
 - `JWT_SECRET` - secret key for JWT (use your own)
 

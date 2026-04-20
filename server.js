@@ -21,6 +21,10 @@ app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/up', (req, res) => {
+    res.status(200).send('OK');
+});
+
 setupSocketHandlers(io);
 
 httpServer.listen(PORT, () => {
